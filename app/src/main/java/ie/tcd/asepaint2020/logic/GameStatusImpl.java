@@ -3,20 +3,18 @@ package ie.tcd.asepaint2020.logic;
 import ie.tcd.asepaint2020.common.Cursor;
 import ie.tcd.asepaint2020.common.GameBoard;
 import ie.tcd.asepaint2020.common.GameInput;
+import ie.tcd.asepaint2020.logic.internal.Point;
 
 public class GameStatusImpl implements GameStatus{
     private Float MaxMovementSpeed = 30f;
     private Float ShootingCooldown = 3f;
 
-    private Float CurrentUserLocationX = 0f;
-    private Float CurrentUserLocationY = 0f;
+    private Point CurrentUserLocation = new Point(0f,0f);
 
-    private Float ViewpointX;
-    private Float ViewpointY;
+    private Point Viewpoint;
     @Override
     public void SetViewpointSize(Float X, Float Y) {
-        ViewpointX=X;
-        ViewpointY=Y;
+        Viewpoint = new Point(X,Y);
     }
 
     @Override
