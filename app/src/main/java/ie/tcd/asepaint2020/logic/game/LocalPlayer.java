@@ -6,6 +6,10 @@ public class LocalPlayer implements Player, ie.tcd.asepaint2020.common.Player {
 
     private String Name;
 
+    public LocalPlayer(String name) {
+        Name = name;
+    }
+
     @Override
     public String getColor() {
         return "Blue";

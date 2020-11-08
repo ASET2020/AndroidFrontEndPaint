@@ -1,14 +1,15 @@
 package ie.tcd.asepaint2020.logic;
 
-import ie.tcd.asepaint2020.common.Cursor;
-import ie.tcd.asepaint2020.common.GameBoard;
-import ie.tcd.asepaint2020.common.GameInput;
-import ie.tcd.asepaint2020.logic.game.BoardImpl;
-import ie.tcd.asepaint2020.logic.game.OuterLimit;
-import ie.tcd.asepaint2020.logic.game.PaintImpl;
+import ie.tcd.asepaint2020.common.*;
+import ie.tcd.asepaint2020.common.Player;
+import ie.tcd.asepaint2020.logic.game.*;
 import ie.tcd.asepaint2020.logic.internal.*;
 
-public class GameStatusImpl implements GameStatus, ViewPointTranslator, TickReceiver {
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
+public class GameStatusImpl implements GameStatus, ViewPointTranslator, TickReceiver, GameBoard {
     private static final int ScreenPointX = 1920;
     private static final int ScreenPointY = 1080;
     private Float MaxMovementSpeed = 300f;
@@ -39,6 +40,10 @@ public class GameStatusImpl implements GameStatus, ViewPointTranslator, TickRece
 
     private final Float SecondsGameRoundTime = 180f;
 
+    private LocalPlayer LocalPlayer = new LocalPlayer("Us");
+
+    private List<RemotePlayer> remotePlayers ;
+
 
     @Override
     public void SetViewpointSize(Float X, Float Y) {
@@ -55,7 +60,7 @@ public class GameStatusImpl implements GameStatus, ViewPointTranslator, TickRece
     @Override
     public GameBoard GetGameStatus() {
 
-        return null;
+        return this;
     }
 
     @Override
@@ -183,6 +188,88 @@ public class GameStatusImpl implements GameStatus, ViewPointTranslator, TickRece
 
 
     private boolean GameInSession(){
-        return SecondsAfterGameStart < SecondsGameRoundTime && SecondsAfterGameStart >= 0;
+        return GameNotEnded() && GameStarted();
+    }
+
+    private boolean GameStarted(){
+        return SecondsAfterGameStart >= 0;
+    }
+
+    private boolean GameNotEnded(){
+        return SecondsAfterGameStart < SecondsGameRoundTime;
+    }
+
+
+    @Override
+    public Float GetRelativeX() {
+        return CanvasBoard.getCurrentLocation().getX();
+    }
+
+    @Override
+    public Float GetRelativeY() {
+        return CanvasBoard.getCurrentLocation().getY();
+    }
+
+    @Override
+    public List<Paint> GetPaints() {
+        //Because java cannot Understand Interface in generics
+        List<PaintImpl> paintList = CanvasBoard.getPaintList();
+        List<Paint> pt = new LinkedList<>();
+        for (PaintImpl pa:paintList
+             ) {
+            pt.add(pa);
+        }
+        return pt;
+    }
+
+    @Override
+    public Float GetSizeX() {
+        return CanvasBoard.getSize().getX();
+    }
+
+    @Override
+    public Float GetSizeY() {
+        return CanvasBoard.getSize().getY();
+    }
+
+    @Override
+    public Boolean IsGameStarted() {
+        return GameStarted();
+    }
+
+    @Override
+    public Float TimeBeforeGameStart() {
+        if (SecondsAfterGameStart == null) {
+            return -2f;
+        }
+
+        if (SecondsAfterGameStart >= 0) {
+            return 0f;
+        }
+
+        return -SecondsAfterGameStart;
+    }
+
+    @Override
+    public Boolean IsGameEnded() {
+        return !GameNotEnded();
+    }
+
+    @Override
+    public Player GetOwnStatus() {
+        return LocalPlayer;
+    }
+
+    @Override
+    public List<Player> GetAllStatus() {
+        List<Player> ret = new ArrayList<>();
+        ret.add(LocalPlayer);
+        if(remotePlayers!=null){
+            for (RemotePlayer rp: remotePlayers
+                 ) {
+                ret.add(rp);
+            }
+        }
+        return ret;
     }
 }

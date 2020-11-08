@@ -8,6 +8,19 @@ import java.util.List;
 public class BoardImpl implements CollidableBox, TickReceiver {
     private OuterLimit screen;
     private List<PaintImpl> paintList;
+
+    public List<PaintImpl> getPaintList() {
+        return paintList;
+    }
+
+    public Point getCurrentLocation() {
+        return CurrentLocation;
+    }
+
+    public Point getSize() {
+        return Size;
+    }
+
     private Point CurrentLocation;
     private Point Size;
 

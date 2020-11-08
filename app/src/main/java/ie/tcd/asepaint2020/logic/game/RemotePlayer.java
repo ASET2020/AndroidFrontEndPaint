@@ -66,6 +66,12 @@ public class RemotePlayer implements Player, ie.tcd.asepaint2020.common.Player {
         return Score;
     }
 
+    public RemotePlayer(Integer ID, String name) {
+        this.ID = ID;
+        this.name = name;
+        this.Score = 0;
+    }
+
     @Override
     public void setScore(Integer score) {
         Score = score;
