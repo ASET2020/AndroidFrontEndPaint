@@ -2,13 +2,23 @@ package ie.tcd.asepaint2020.logic.game;
 
 import ie.tcd.asepaint2020.logic.internal.*;
 
+import java.util.LinkedList;
 import java.util.List;
 
-public class BoardImpl implements CollidableBox {
+public class BoardImpl implements CollidableBox, TickReceiver {
     private OuterLimit screen;
     private List<PaintImpl> paintList;
     private Point CurrentLocation;
     private Point Size;
+
+    private Point MovementVector = new Point(0f,0f);
+
+    public BoardImpl(OuterLimit screen) {
+        this.screen = screen;
+        this.paintList = new LinkedList<>();
+        this.CurrentLocation = new Point(0f,0f);
+        this.Size = new Point(320f,180f);
+    }
 
     @Override
     public Point GetOrigin() {
@@ -53,5 +63,10 @@ public class BoardImpl implements CollidableBox {
 
     public void AddConfirmedPaint(PaintImpl paint) {
         paintList.add(paint);
+    }
+
+    @Override
+    public void Tick(Float tickScaler) {
+
     }
 }
