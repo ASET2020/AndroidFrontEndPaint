@@ -178,7 +178,7 @@ public class GameStatusImpl implements GameStatus, ViewPointTranslator, TickRece
     }
 
     private void submitHitToServer(CollidableCircle cc){
-
+        //Translate to canvas reference first
     }
 
     private void updateBoardWithPaint(PaintImpl paint){
