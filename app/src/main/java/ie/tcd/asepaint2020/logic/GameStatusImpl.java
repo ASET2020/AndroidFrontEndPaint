@@ -3,6 +3,8 @@ package ie.tcd.asepaint2020.logic;
 import ie.tcd.asepaint2020.common.Cursor;
 import ie.tcd.asepaint2020.common.GameBoard;
 import ie.tcd.asepaint2020.common.GameInput;
+import ie.tcd.asepaint2020.logic.game.BoardImpl;
+import ie.tcd.asepaint2020.logic.game.OuterLimit;
 import ie.tcd.asepaint2020.logic.internal.Metronome;
 import ie.tcd.asepaint2020.logic.internal.Point;
 import ie.tcd.asepaint2020.logic.internal.ViewPointTranslator;
@@ -28,6 +30,10 @@ public class GameStatusImpl implements GameStatus, ViewPointTranslator {
     private Point Viewpoint;
 
     private Metronome mt;
+
+    private OuterLimit viewpointLimit;
+    private BoardImpl CanvasBoard;
+
 
     @Override
     public void SetViewpointSize(Float X, Float Y) {
