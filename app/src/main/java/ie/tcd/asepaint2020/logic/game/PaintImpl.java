@@ -6,6 +6,14 @@ import ie.tcd.asepaint2020.logic.internal.CollidableCircle;
 import ie.tcd.asepaint2020.logic.internal.Point;
 
 public class PaintImpl implements CollidableCircle, Paint {
+    public PaintImpl(BoardImpl board, Point relPosition, Float paintSize, Player owner, ViewPointTranslator tr) {
+        this.board = board;
+        this.relPosition = relPosition;
+        PaintSize = paintSize;
+        Owner = owner;
+        this.tr = tr;
+    }
+
     BoardImpl board;
     Point relPosition;
 

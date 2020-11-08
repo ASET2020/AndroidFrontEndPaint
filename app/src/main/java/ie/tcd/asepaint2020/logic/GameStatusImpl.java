@@ -44,6 +44,8 @@ public class GameStatusImpl implements GameStatus, ViewPointTranslator, TickRece
 
     private List<RemotePlayer> remotePlayers ;
 
+    private NetworkSync ns;
+
 
     @Override
     public void SetViewpointSize(Float X, Float Y) {
@@ -105,7 +107,23 @@ public class GameStatusImpl implements GameStatus, ViewPointTranslator, TickRece
     }
 
     public void updateInternal() {
-        mt.Pulse(this);
+        if((ns.IsMatchMakingFinished() && this.SecondsAfterGameStart==null) || (this.SecondsAfterGameStart!=null && this.SecondsAfterGameStart <= 0)){
+            this.SecondsAfterGameStart = - ns.GetTimeBeforeGameStart();
+            this.remotePlayers = ns.GetPlayers();
+            if(this.SecondsAfterGameStart>=0){
+                initGame();
+            }
+        }
+        if(this.SecondsAfterGameStart!=null&&this.SecondsAfterGameStart>=0){
+            mt.Pulse(this);
+            this.remotePlayers = ns.GetPlayers();
+            List<NetworkPaint> networkPaints = ns.GetNewConfirmedHits();
+            for (NetworkPaint np:networkPaints
+                 ) {
+                PaintImpl pi = new PaintImpl(CanvasBoard,np.Location(),np.Size(),remotePlayers.get(np.OwnerID()),this);
+                updateBoardWithPaint(pi);
+            }
+        }
     }
 
     @Override
