@@ -5,8 +5,9 @@ import ie.tcd.asepaint2020.common.GameBoard;
 import ie.tcd.asepaint2020.common.GameInput;
 import ie.tcd.asepaint2020.logic.internal.Metronome;
 import ie.tcd.asepaint2020.logic.internal.Point;
+import ie.tcd.asepaint2020.logic.internal.ViewPointTranslator;
 
-public class GameStatusImpl implements GameStatus {
+public class GameStatusImpl implements GameStatus, ViewPointTranslator {
     private static final int ScreenPointX = 1920;
     private static final int ScreenPointY = 1080;
     private Float MaxMovementSpeed = 300f;
@@ -85,7 +86,8 @@ public class GameStatusImpl implements GameStatus {
 
     }
 
-    private Point translatePointToMatchViewpoint(Point pt) {
+    @Override
+    public Point translatePointToMatchViewpoint(Point pt) {
         return new Point(((Viewpoint.getX() / ScreenPointX) * pt.getX()), ((Viewpoint.getY() / ScreenPointY) * pt.getY()));
     }
 }
