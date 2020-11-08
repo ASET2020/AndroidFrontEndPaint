@@ -40,7 +40,11 @@ public class GameStatusImpl implements GameStatus, ViewPointTranslator {
         if (((X / Y) - (16f / 9f)) > 0.1) {
             throw new RuntimeException("Aspect Ratio Should be 16:9");
         }
+        if (Viewpoint!=null){
+            throw new RuntimeException("Do not support the change of Viewpoint");
+        }
         Viewpoint = new Point(X, Y);
+        viewpointLimit = new OuterLimit(X,Y);
     }
 
     @Override
