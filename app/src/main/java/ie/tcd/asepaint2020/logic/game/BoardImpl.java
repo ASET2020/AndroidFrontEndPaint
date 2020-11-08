@@ -11,7 +11,7 @@ public class BoardImpl implements CollidableBox, TickReceiver {
     private Point CurrentLocation;
     private Point Size;
 
-    private Point MovementVector = new Point(0f,0f);
+    private Point MovementVector = new Point(2f,4f);
 
     public BoardImpl(OuterLimit screen) {
         this.screen = screen;
@@ -44,6 +44,7 @@ public class BoardImpl implements CollidableBox, TickReceiver {
         AllCollideJudgements.loadAllJudgements();
     }
 
+    //PaintWish's Location is relative to screen
     public boolean JudgePaintHitOrMiss(CollidableCircle PaintWish) {
         //First make sure that the paint is on the screen canvas
         if (!CollideJudgment.IsIntersectionExist(PaintWish, this)) {
@@ -61,12 +62,25 @@ public class BoardImpl implements CollidableBox, TickReceiver {
         return true;
     }
 
+    //paint's Location is relative to canvas
     public void AddConfirmedPaint(PaintImpl paint) {
         paintList.add(paint);
     }
 
     @Override
     public void Tick(Float tickScaler) {
+        //Bound Check and update speed
+        Point loc = new Point(CurrentLocation.getX() + MovementVector.getX() * tickScaler,CurrentLocation.getY() + MovementVector.getY() *tickScaler);
 
+        if (!CollideJudgment.IsIntersectionExist(this, screen)){
+            if (Pointutil.isHittingTopOrBottom(screen.GetPrincipleLocation(),loc)){
+                MovementVector.setY( - MovementVector.getY());
+            }
+            if (Pointutil.isHittingLeftOrRight(screen.GetPrincipleLocation(),loc)){
+                MovementVector.setX( - MovementVector.getX());
+            }
+        }else{
+            CurrentLocation = loc;
+        }
     }
 }
