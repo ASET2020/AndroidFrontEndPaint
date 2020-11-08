@@ -141,7 +141,7 @@ public class GameStatusImpl implements GameStatus, ViewPointTranslator, TickRece
         CursorSpeedVector.setY(Math.min((CursorSpeedVector.getY() * AttritionFactor) + (YMovement * MovementFactor),MaxMovementSpeed));
 
         //Bound Check and update speed
-        Point loc = new Point(CursorLocationVector.getX() + CursorSpeedVector.getX() * tickScaler,CursorLocationVector.getY()*tickScaler);
+        Point loc = new Point(CursorLocationVector.getX() + CursorSpeedVector.getX() * tickScaler,CursorLocationVector.getY()+ CursorSpeedVector.getY()*tickScaler);
 
         if (!CollideJudgment.IsIntersectionExist(new CollidableCircleImpl(loc,CursorSize), viewpointLimit)){
             if (Pointutil.isHittingTopOrBottom(viewpointLimit.GetPrincipleLocation(),loc)){
