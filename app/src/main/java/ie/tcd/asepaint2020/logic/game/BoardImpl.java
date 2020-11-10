@@ -1,5 +1,6 @@
 package ie.tcd.asepaint2020.logic.game;
 
+import ie.tcd.asepaint2020.common.Paint;
 import ie.tcd.asepaint2020.logic.internal.*;
 
 import java.util.LinkedList;
@@ -73,6 +74,10 @@ public class BoardImpl implements CollidableBox, TickReceiver {
         }
         //Caller Send to server for confirmation
         return true;
+    }
+
+    public Point GetRelativeLocation(Point absLoc) {
+        return new Point(absLoc.getX()-CurrentLocation.getX(),absLoc.getY()-CurrentLocation.getY());
     }
 
     //paint's Location is relative to canvas

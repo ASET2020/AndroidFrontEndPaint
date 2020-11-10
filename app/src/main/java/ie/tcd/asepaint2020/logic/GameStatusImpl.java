@@ -46,6 +46,9 @@ public class GameStatusImpl implements GameStatus, ViewPointTranslator, TickRece
 
     private NetworkSync ns;
 
+    public GameStatusImpl(NetworkSync ns) {
+        this.ns = ns;
+    }
 
     @Override
     public void SetViewpointSize(Float X, Float Y) {
@@ -187,7 +190,7 @@ public class GameStatusImpl implements GameStatus, ViewPointTranslator, TickRece
                 ShootingCooldownRemain = ShootingCooldownSec;
                 //Judge If There is a hit
                 CollidableCircle cc = new CollidableCircleImpl(CursorLocationVector,CursorSize);
-                boolean hit = CollideJudgment.IsIntersectionExist(cc,CanvasBoard);
+                boolean hit = CanvasBoard.JudgePaintHitOrMiss(cc);
                 if (hit){
                     submitHitToServer(cc);
                 }
@@ -197,7 +200,9 @@ public class GameStatusImpl implements GameStatus, ViewPointTranslator, TickRece
 
     private void submitHitToServer(CollidableCircle cc){
         //Translate to canvas reference first
+        ns.SubmitHit(new CollidableCircleImpl(CanvasBoard.GetRelativeLocation(cc.GetPrincipleLocation()),cc.GetPrincipleSize()));
     }
+
 
     private void updateBoardWithPaint(PaintImpl paint){
         CanvasBoard.AddConfirmedPaint(paint);
