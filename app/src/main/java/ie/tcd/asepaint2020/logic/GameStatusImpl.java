@@ -1,5 +1,6 @@
 package ie.tcd.asepaint2020.logic;
 
+import android.util.Log;
 import ie.tcd.asepaint2020.common.*;
 import ie.tcd.asepaint2020.common.Player;
 import ie.tcd.asepaint2020.logic.game.*;
@@ -10,8 +11,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class GameStatusImpl implements GameStatus, ViewPointTranslator, TickReceiver, GameBoard {
-    private static final int ScreenPointX = 1920;
-    private static final int ScreenPointY = 1080;
+    private static final int ScreenPointX = 1080;
+    private static final int ScreenPointY = 1920;
     private Float MaxMovementSpeed = 300f;
     private Float ShootingCooldownSec = 0.8f;
     private Float CursorSize = 30f;
@@ -19,7 +20,7 @@ public class GameStatusImpl implements GameStatus, ViewPointTranslator, TickRece
     private Point CursorLocationVector = new Point(0f, 0f);
     private Point CursorSpeedVector = new Point(0f, 0f);
 
-    private Point CurrentCursorLocation = new Point(0f, 0f);
+    //private Point CurrentCursorLocation = new Point(0f, 0f);
     private Float JoystickMovementDir = 0f;
     private Float JoystickMovementForce = 0f;
 
@@ -52,7 +53,7 @@ public class GameStatusImpl implements GameStatus, ViewPointTranslator, TickRece
 
     @Override
     public void SetViewpointSize(Float X, Float Y) {
-        if (((X / Y) - (16f / 9f)) > 0.1) {
+        if (((X / Y) - (9f / 16f)) > 0.1) {
             throw new RuntimeException("Aspect Ratio Should be 16:9");
         }
         if (Viewpoint != null) {
@@ -64,17 +65,22 @@ public class GameStatusImpl implements GameStatus, ViewPointTranslator, TickRece
 
     @Override
     public GameBoard GetGameStatus() {
-
+        pollSync();
         return this;
+    }
+
+    private void pollSync(){
+        updateInternal();
     }
 
     @Override
     public void SubmitMovement(GameInput input) {
         if (!input.IsMoving()) {
             JoystickMovementForce = 0f;
+        }else {
+            JoystickMovementForce = input.GetForce();
         }
         JoystickMovementDir = input.GetDirection();
-        JoystickMovementForce = input.GetForce();
 
         IsShooting = input.IsShooting();
     }
@@ -110,11 +116,16 @@ public class GameStatusImpl implements GameStatus, ViewPointTranslator, TickRece
     }
 
     public void updateInternal() {
+        if(Viewpoint == null){
+            return;
+        }
         if((ns.IsMatchMakingFinished() && this.SecondsAfterGameStart==null) || (this.SecondsAfterGameStart!=null && this.SecondsAfterGameStart <= 0)){
             this.SecondsAfterGameStart = - ns.GetTimeBeforeGameStart();
             this.remotePlayers = ns.GetPlayers();
             if(this.SecondsAfterGameStart>=0){
-                initGame();
+                if(CanvasBoard==null){
+                    initGame();
+                }
             }
         }
         if(this.SecondsAfterGameStart!=null&&this.SecondsAfterGameStart>=0){
@@ -160,13 +171,14 @@ public class GameStatusImpl implements GameStatus, ViewPointTranslator, TickRece
         Float MovementFactor = 1 - AttritionFactor;
 
         //Cursor Movement Acceleration
-        Float XMovement = (float) Math.sin(JoystickMovementDir) * JoystickMovementForce;
-        Float YMovement = (float) Math.cos(JoystickMovementDir) * JoystickMovementForce;
+        Float XMovement =  - (float) Math.cos(JoystickMovementDir) * JoystickMovementForce;
+        Float YMovement = (float) Math.sin(JoystickMovementDir) * JoystickMovementForce;
 
         CursorSpeedVector.setX(Math.min((CursorSpeedVector.getX() * AttritionFactor) + (XMovement * MovementFactor),MaxMovementSpeed));
         CursorSpeedVector.setY(Math.min((CursorSpeedVector.getY() * AttritionFactor) + (YMovement * MovementFactor),MaxMovementSpeed));
 
         //Bound Check and update speed
+        /*
         Point loc = new Point(CursorLocationVector.getX() + CursorSpeedVector.getX() * tickScaler,CursorLocationVector.getY()+ CursorSpeedVector.getY()*tickScaler);
 
         if (!CollideJudgment.IsIntersectionExist(new CollidableCircleImpl(loc,CursorSize), viewpointLimit)){
@@ -178,7 +190,9 @@ public class GameStatusImpl implements GameStatus, ViewPointTranslator, TickRece
             }
         }else{
             CursorLocationVector = loc;
-        }
+        }*/
+
+        CursorLocationVector = new Point(CursorLocationVector.getX() + XMovement * tickScaler,CursorLocationVector.getY()+ YMovement *tickScaler);
 
         //Ask Canvas board to update
         CanvasBoard.Tick(tickScaler);
@@ -225,11 +239,19 @@ public class GameStatusImpl implements GameStatus, ViewPointTranslator, TickRece
 
     @Override
     public Float GetRelativeX() {
+        pollSync();
+        if (CanvasBoard == null){
+            return 0f;
+        }
         return CanvasBoard.getCurrentLocation().getX();
     }
 
     @Override
     public Float GetRelativeY() {
+        pollSync();
+        if (CanvasBoard == null){
+            return 0f;
+        }
         return CanvasBoard.getCurrentLocation().getY();
     }
 
@@ -247,11 +269,19 @@ public class GameStatusImpl implements GameStatus, ViewPointTranslator, TickRece
 
     @Override
     public Float GetSizeX() {
+        pollSync();
+        if (CanvasBoard == null){
+            return 0f;
+        }
         return CanvasBoard.getSize().getX();
     }
 
     @Override
     public Float GetSizeY() {
+        pollSync();
+        if (CanvasBoard == null){
+            return 0f;
+        }
         return CanvasBoard.getSize().getY();
     }
 

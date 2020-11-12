@@ -1,16 +1,24 @@
 package ie.tcd.asepaint2020.fragment;
 
+import android.os.Handler;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
-
 import ie.tcd.asepaint2020.R;
+import ie.tcd.asepaint2020.common.GameInput;
+import ie.tcd.asepaint2020.logic.GameStatus;
+import ie.tcd.asepaint2020.logic.GameStatusImpl;
+import ie.tcd.asepaint2020.logic.LocalPlayNetworkSync;
 import ie.tcd.asepaint2020.utils.DisplayUtil;
 import io.github.controlwear.virtual.joystick.android.JoystickView;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class GameFragment extends BaseFragment {
 
@@ -24,6 +32,9 @@ public class GameFragment extends BaseFragment {
 
     ImageView ivPaint;
 
+    private Handler handler = new Handler();
+    Timer myt = new Timer();
+
 
     @Override
     int getLayoutId() {
@@ -33,8 +44,37 @@ public class GameFragment extends BaseFragment {
 
     GameBoardView board;
 
+    GameStatus gs;
+
+    Boolean isMoving = false;
+    Float joystickDirection = 0f;
+    Float joystickForce = 0f;
+    Boolean isShooting = false;
+
+    GameInput gi = new GameInput() {
+        @Override
+        public Boolean IsMoving() {
+            return isMoving;
+        }
+
+        @Override
+        public Float GetDirection() {
+            return joystickDirection;
+        }
+
+        @Override
+        public Float GetForce() {
+            return joystickForce;
+        }
+
+        @Override
+        public Boolean IsShooting() {
+            return isShooting;
+        }
+    };
+
     @Override
-    void initView(View view) {
+    void initView(final View view) {
 
         // TODO: 09/11/2020  should init color
         cursor = view.findViewById(R.id.cursor);
@@ -42,7 +82,17 @@ public class GameFragment extends BaseFragment {
 
         board = view.findViewById(R.id.board);
 
-        board.startMove(60);
+        //board.startMove(60);
+
+        this.gs = new GameStatusImpl(new LocalPlayNetworkSync());
+        view.getRootView().post(new Runnable() {
+            @Override
+            public void run() {
+                gs.SetViewpointSize((float) view.getRootView().getMeasuredWidth(), (float) view.getRootView().getMeasuredHeight());
+            }
+        });
+
+        board.setGameLogic(gs);
 
         btnThrow = view.findViewById(R.id.btn_throw);
         btnThrow.setOnClickListener(new View.OnClickListener() {
@@ -50,7 +100,22 @@ public class GameFragment extends BaseFragment {
             public void onClick(View view) {
                 // TODO: 09/11/2020
 //                Toast.makeText(getContext(), "shooting ....", Toast.LENGTH_LONG).show();
-                startThrowAnim();
+                //startThrowAnim();
+                //isShooting = true;
+            }
+        });
+
+        btnThrow.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    isShooting = true;
+                }
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    isShooting = false;
+                }
+                gs.SubmitMovement(gi);
+                return false;
             }
         });
 
@@ -62,6 +127,8 @@ public class GameFragment extends BaseFragment {
 
                 Log.d("GameFragment", "angle" + angle + "--strength" + strength);
                 if (angle == 0 && strength == 0) {
+                    isMoving = false;
+                    gs.SubmitMovement(gi);
                     return;
                 }
 
@@ -72,11 +139,47 @@ public class GameFragment extends BaseFragment {
                 Log.d("GameFragment", "y=" + y);
 
                 // TODO: 08/11/2020 detect margin
-                ((View) cursor.getParent()).scrollBy(x, y);
+                //((View) cursor.getParent()).scrollBy(x, y);
+                isMoving = true;
+                joystickDirection = (float) Math.toRadians(angle);
+                joystickForce = (float) strength;
+                gs.SubmitMovement(gi);
 
+                View parent = (View) cursor.getParent();
+                final int scrollY = parent.getScrollY();
+                final int scrollX = parent.getScrollX();
+
+                Log.d("jump", "scrollY:" + scrollY);
+                Log.d("jump", "scrollX:" + scrollX);
             }
         });
+
+        joystick.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                if (event.getAction() == MotionEvent.ACTION_UP) {
+                    isMoving = false;
+                }
+                gs.SubmitMovement(gi);
+                return false;
+            }
+        });
+
+        myt.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        View parent = (View) cursor.getParent();
+                        parent.scrollTo(Math.round(gs.GetCursor().GetX()),Math.round(gs.GetCursor().GetY()));
+                        board.invalidate();
+                    }
+                });
+            }
+        },10,10);
     }
+
 
     private void startThrowAnim() {
 
