@@ -1,14 +1,26 @@
 package ie.tcd.asepaint2020.logic;
 
-import android.util.Log;
-import ie.tcd.asepaint2020.common.*;
-import ie.tcd.asepaint2020.common.Player;
-import ie.tcd.asepaint2020.logic.game.*;
-import ie.tcd.asepaint2020.logic.internal.*;
-
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+
+import ie.tcd.asepaint2020.common.Cursor;
+import ie.tcd.asepaint2020.common.GameBoard;
+import ie.tcd.asepaint2020.common.GameInput;
+import ie.tcd.asepaint2020.common.Paint;
+import ie.tcd.asepaint2020.common.Player;
+import ie.tcd.asepaint2020.logic.game.BoardImpl;
+import ie.tcd.asepaint2020.logic.game.LocalPlayer;
+import ie.tcd.asepaint2020.logic.game.OuterLimit;
+import ie.tcd.asepaint2020.logic.game.PaintImpl;
+import ie.tcd.asepaint2020.logic.game.RemotePlayer;
+import ie.tcd.asepaint2020.logic.internal.AllCollideJudgements;
+import ie.tcd.asepaint2020.logic.internal.CollidableCircle;
+import ie.tcd.asepaint2020.logic.internal.CollidableCircleImpl;
+import ie.tcd.asepaint2020.logic.internal.Metronome;
+import ie.tcd.asepaint2020.logic.internal.Point;
+import ie.tcd.asepaint2020.logic.internal.TickReceiver;
+import ie.tcd.asepaint2020.logic.internal.ViewPointTranslator;
 
 public class GameStatusImpl implements GameStatus, ViewPointTranslator, TickReceiver, GameBoard {
     private static final int ScreenPointX = 1080;
@@ -53,9 +65,9 @@ public class GameStatusImpl implements GameStatus, ViewPointTranslator, TickRece
 
     @Override
     public void SetViewpointSize(Float X, Float Y) {
-        if (((X / Y) - (9f / 16f)) > 0.1) {
-            throw new RuntimeException("Aspect Ratio Should be 16:9");
-        }
+//        if (((X / Y) - (9f / 16f)) > 0.1) {
+//            throw new RuntimeException("Aspect Ratio Should be 16:9");
+//        }
         if (Viewpoint != null) {
             throw new RuntimeException("Do not support the change of Viewpoint");
         }
