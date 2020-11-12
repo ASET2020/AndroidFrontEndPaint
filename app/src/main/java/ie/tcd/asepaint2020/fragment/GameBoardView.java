@@ -14,6 +14,7 @@ import android.view.animation.AccelerateInterpolator;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
+import ie.tcd.asepaint2020.logic.GameStatus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,14 +72,31 @@ public class GameBoardView extends View {
     protected void onDraw(Canvas canvas) {
         canvas.translate(getWidth() / 2 - size / 2, 0);
         paint.setColor(Color.BLACK);
-        canvas.drawRect(left, top, left + size, top + size, paint);
+        left = gs.GetGameStatus().GetRelativeX();
+        top = gs.GetGameStatus().GetRelativeY();
+        Float sizex = gs.GetGameStatus().GetSizeX();
+        Float sizey = gs.GetGameStatus().GetSizeY();
+        canvas.drawRect(left, top, left + sizex, top + sizey, paint);
 
         if (!hitResults.isEmpty()) {
-            for (Hits hit : hitResults) {
-                paint.setColor(hit.color);
-                canvas.drawCircle(left + hit.hit_x, top + hit.hit_y, 15, paint);
+            List<ie.tcd.asepaint2020.common.Paint> pi = gs.GetGameStatus().GetPaints();
+
+            for (ie.tcd.asepaint2020.common.Paint hit : pi) {
+                String pclor = hit.Color();
+                switch (pclor){
+                    case "Blue":
+                        paint.setColor(Color.BLUE);
+                }
+
+                canvas.drawCircle(left + hit.LocationX(), top + hit.LocationY(), 15, paint);
             }
         }
+    }
+
+    GameStatus gs;
+
+    public void setGameLogic(GameStatus gs){
+        this.gs = gs;
     }
 
     public void startMove(int seconds) {
