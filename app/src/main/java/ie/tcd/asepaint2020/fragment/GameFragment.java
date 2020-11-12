@@ -7,7 +7,6 @@ import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.Toast;
 
 import ie.tcd.asepaint2020.R;
 import ie.tcd.asepaint2020.utils.DisplayUtil;
@@ -15,7 +14,7 @@ import io.github.controlwear.virtual.joystick.android.JoystickView;
 
 public class GameFragment extends BaseFragment {
 
-    public final int MOVE_DISTANCE = DisplayUtil.dip2px(getContext(), 5);
+    public final int MOVE_DISTANCE = DisplayUtil.dip2px(getContext(), 7);
 
     View cursor;
 
@@ -31,6 +30,9 @@ public class GameFragment extends BaseFragment {
         return R.layout.fragment_game;
     }
 
+
+    GameBoardView board;
+
     @Override
     void initView(View view) {
 
@@ -38,12 +40,16 @@ public class GameFragment extends BaseFragment {
         cursor = view.findViewById(R.id.cursor);
         joystick = view.findViewById(R.id.joystickView);
 
+        board = view.findViewById(R.id.board);
+
+        board.startMove(60);
+
         btnThrow = view.findViewById(R.id.btn_throw);
         btnThrow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 // TODO: 09/11/2020
-                Toast.makeText(getContext(), "shooting ....", Toast.LENGTH_LONG).show();
+//                Toast.makeText(getContext(), "shooting ....", Toast.LENGTH_LONG).show();
                 startThrowAnim();
             }
         });
@@ -76,8 +82,11 @@ public class GameFragment extends BaseFragment {
 
 
         View parent = (View) cursor.getParent();
-        int scrollY = parent.getScrollY();
-        int scrollX = parent.getScrollX();
+        final int scrollY = parent.getScrollY();
+        final int scrollX = parent.getScrollX();
+
+        Log.d("jump", "scrollY:" + scrollY);
+        Log.d("jump", "scrollX:" + scrollX);
 
         int y = ivPaint.getBottom() / 2 + scrollY;
         int x = scrollX;
@@ -99,6 +108,9 @@ public class GameFragment extends BaseFragment {
             @Override
             public void onAnimationEnd(Animation animation) {
                 ivPaint.setVisibility(View.INVISIBLE);
+                Log.d("jump", "scrollY:" + scrollY);
+                Log.d("jump", "scrollX:" + scrollX);
+                board.getLocalThrowResult(scrollX, scrollY);
             }
 
             @Override
