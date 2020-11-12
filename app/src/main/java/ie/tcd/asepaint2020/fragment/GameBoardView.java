@@ -8,16 +8,15 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import ie.tcd.asepaint2020.logic.GameStatus;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import ie.tcd.asepaint2020.logic.GameStatus;
 
 public class GameBoardView extends View {
 
@@ -70,12 +69,17 @@ public class GameBoardView extends View {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        canvas.translate(getWidth() / 2 - size / 2, 0);
         paint.setColor(Color.BLACK);
         left = gs.GetGameStatus().GetRelativeX();
         top = gs.GetGameStatus().GetRelativeY();
+
         Float sizex = gs.GetGameStatus().GetSizeX();
         Float sizey = gs.GetGameStatus().GetSizeY();
+
+        // get center coordinate
+        float centerX = left + sizex / 2;
+        float centerY = top + sizey / 2;
+
         canvas.drawRect(left, top, left + sizex, top + sizey, paint);
 
         if (!hitResults.isEmpty()) {
@@ -83,7 +87,7 @@ public class GameBoardView extends View {
 
             for (ie.tcd.asepaint2020.common.Paint hit : pi) {
                 String pclor = hit.Color();
-                switch (pclor){
+                switch (pclor) {
                     case "Blue":
                         paint.setColor(Color.BLUE);
                 }
@@ -123,35 +127,18 @@ public class GameBoardView extends View {
             directionY = -1;
         }
         top = top + directionY * speed * value;
-
         if (left <= -(getRight() / 2) + size / 2 && directionX == -1) {
             directionX = 1;
         } else if (left >= (getRight() / 2 - size / 2) && directionX == 1) {
             directionX = -1;
         }
         left = left + directionX * speed * value;
-
         invalidate();
     }
 
     public void voidStopMove() {
         if (moveAnimator != null) {
             moveAnimator.cancel();
-        }
-    }
-
-    public void getLocalThrowResult(int scrollX, int scrollY) {
-        int transX = (int) (-scrollX + size / 2 - left);
-        int transY = (int) (getHeight() / 2 - scrollY - top);
-
-        Log.d("jump", "transX" + transX);
-        Log.d("jump", "transY" + transY);
-        if (0 <= transX && transX <= size) {
-            if (transY >= 0 && transY <= size) {
-                Toast.makeText(getContext(), "Hit!!!", Toast.LENGTH_SHORT).show();
-                hitResults.add(new Hits(transX, transY, Color.parseColor("#009688")));
-                invalidate();
-            }
         }
     }
 }

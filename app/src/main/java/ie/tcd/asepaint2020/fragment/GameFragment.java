@@ -2,6 +2,7 @@ package ie.tcd.asepaint2020.fragment;
 
 import android.os.Handler;
 import android.util.Log;
+import android.util.Pair;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
@@ -9,6 +10,11 @@ import android.view.animation.Animation;
 import android.view.animation.TranslateAnimation;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
+
+import java.util.Timer;
+import java.util.TimerTask;
+
 import ie.tcd.asepaint2020.R;
 import ie.tcd.asepaint2020.common.GameInput;
 import ie.tcd.asepaint2020.logic.GameStatus;
@@ -16,9 +22,6 @@ import ie.tcd.asepaint2020.logic.GameStatusImpl;
 import ie.tcd.asepaint2020.logic.LocalPlayNetworkSync;
 import ie.tcd.asepaint2020.utils.DisplayUtil;
 import io.github.controlwear.virtual.joystick.android.JoystickView;
-
-import java.util.Timer;
-import java.util.TimerTask;
 
 public class GameFragment extends BaseFragment {
 
@@ -51,6 +54,8 @@ public class GameFragment extends BaseFragment {
     Float joystickForce = 0f;
     Boolean isShooting = false;
 
+    TextView tvShootTip;
+
     GameInput gi = new GameInput() {
         @Override
         public Boolean IsMoving() {
@@ -82,13 +87,15 @@ public class GameFragment extends BaseFragment {
 
         board = view.findViewById(R.id.board);
 
+        tvShootTip = view.findViewById(R.id.tv_shoot_tip);
+
         //board.startMove(60);
 
         this.gs = new GameStatusImpl(new LocalPlayNetworkSync());
         view.getRootView().post(new Runnable() {
             @Override
             public void run() {
-                gs.SetViewpointSize((float) view.getRootView().getMeasuredWidth(), (float) view.getRootView().getMeasuredHeight());
+                gs.SetViewpointSize((float) board.getWidth(), (float) board.getHeight());
             }
         });
 
@@ -145,12 +152,6 @@ public class GameFragment extends BaseFragment {
                 joystickForce = (float) strength;
                 gs.SubmitMovement(gi);
 
-                View parent = (View) cursor.getParent();
-                final int scrollY = parent.getScrollY();
-                final int scrollX = parent.getScrollX();
-
-                Log.d("jump", "scrollY:" + scrollY);
-                Log.d("jump", "scrollX:" + scrollX);
             }
         });
 
@@ -193,6 +194,7 @@ public class GameFragment extends BaseFragment {
 
         int y = ivPaint.getBottom() / 2 + scrollY;
         int x = scrollX;
+
         ivPaint.setVisibility(View.VISIBLE);
 
         TranslateAnimation translateAnimation = new TranslateAnimation(
@@ -211,9 +213,9 @@ public class GameFragment extends BaseFragment {
             @Override
             public void onAnimationEnd(Animation animation) {
                 ivPaint.setVisibility(View.INVISIBLE);
-                Log.d("jump", "scrollY:" + scrollY);
-                Log.d("jump", "scrollX:" + scrollX);
-                board.getLocalThrowResult(scrollX, scrollY);
+//                Log.d("jump", "scrollY:" + scrollY);
+//                Log.d("jump", "scrollX:" + scrollX);
+//                board.getLocalThrowResult(scrollX, scrollY);
             }
 
             @Override
@@ -222,7 +224,26 @@ public class GameFragment extends BaseFragment {
             }
         });
         ivPaint.startAnimation(translateAnimation);
+    }
 
 
+    public void changeTips(String text) {
+        if (tvShootTip != null) {
+            tvShootTip.setText(text);
+        }
+    }
+
+    private Pair getCursorPosition() {
+
+        View parent = (View) cursor.getParent();
+        final int scrollY = parent.getScrollY();
+        final int scrollX = parent.getScrollX();
+        // Cursor center
+        float newX = cursor.getLeft() - scrollX + cursor.getWidth() / 2f;
+        float newY = cursor.getTop() - scrollY + cursor.getHeight() / 2f;
+
+        Log.d("jump", "newX" + newX);
+        Log.d("jump", "newY" + newY);
+        return new Pair<Float, Float>(newX, newY);
     }
 }

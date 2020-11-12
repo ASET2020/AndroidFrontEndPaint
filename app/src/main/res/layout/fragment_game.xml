@@ -41,6 +41,14 @@
             android:layout_width="30dp"
             android:layout_height="30dp" />
 
+        <TextView
+            android:id="@+id/tv_shoot_tip"
+            android:text=""
+            android:layout_alignParentRight="true"
+            android:layout_marginTop="-20dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
     </RelativeLayout>
 
 
@@ -73,7 +81,7 @@
                 android:text="Throw"
                 android:background="@drawable/selector_throw_button"
                 android:layout_width="wrap_content"
-                android:layout_height="30dp" />
+                android:layout_height="50dp" />
 
         </RelativeLayout>
 
