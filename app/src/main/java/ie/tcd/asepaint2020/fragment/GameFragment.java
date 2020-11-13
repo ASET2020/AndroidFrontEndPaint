@@ -173,7 +173,8 @@ public class GameFragment extends BaseFragment {
                     @Override
                     public void run() {
                         View parent = (View) cursor.getParent();
-                        parent.scrollTo(Math.round(gs.GetCursor().GetX()),Math.round(gs.GetCursor().GetY()));
+                        parent.scrollTo(Math.round(cursor.getLeft() - gs.GetCursor().GetX() + cursor.getWidth() / 2f),
+                                Math.round(cursor.getTop() - gs.GetCursor().GetY() + + cursor.getHeight() / 2f));
                         board.invalidate();
                     }
                 });

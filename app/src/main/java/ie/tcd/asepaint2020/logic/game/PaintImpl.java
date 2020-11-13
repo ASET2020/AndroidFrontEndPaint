@@ -55,12 +55,12 @@ public class PaintImpl implements CollidableCircle, Paint {
 
     @Override
     public Float LocationX() {
-        return tr.translatePointToMatchViewpoint(GetOrigin()).getX();
+        return tr.translatePointToMatchViewpoint(relPosition).getX();
     }
 
     @Override
     public Float LocationY() {
-        return tr.translatePointToMatchViewpoint(GetOrigin()).getY();
+        return tr.translatePointToMatchViewpoint(relPosition).getY();
     }
 
     @Override

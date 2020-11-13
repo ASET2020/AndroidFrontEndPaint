@@ -82,7 +82,7 @@ public class GameBoardView extends View {
 
         canvas.drawRect(left, top, left + sizex, top + sizey, paint);
 
-        if (!hitResults.isEmpty()) {
+
             List<ie.tcd.asepaint2020.common.Paint> pi = gs.GetGameStatus().GetPaints();
 
             for (ie.tcd.asepaint2020.common.Paint hit : pi) {
@@ -92,9 +92,9 @@ public class GameBoardView extends View {
                         paint.setColor(Color.BLUE);
                 }
 
-                canvas.drawCircle(left + hit.LocationX(), top + hit.LocationY(), 15, paint);
+                canvas.drawCircle(left + hit.LocationX(), top + hit.LocationY() , hit.Size(), paint);
             }
-        }
+
     }
 
     GameStatus gs;

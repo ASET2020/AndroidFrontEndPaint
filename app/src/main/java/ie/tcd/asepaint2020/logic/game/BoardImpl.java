@@ -1,6 +1,5 @@
 package ie.tcd.asepaint2020.logic.game;
 
-import ie.tcd.asepaint2020.common.Paint;
 import ie.tcd.asepaint2020.logic.internal.*;
 
 import java.util.LinkedList;
@@ -25,13 +24,13 @@ public class BoardImpl implements CollidableBox, TickReceiver {
     private Point CurrentLocation;
     private Point Size;
 
-    private Point MovementVector = new Point(2f,4f);
+    private Point MovementVector = new Point(480f, 360f);
 
     public BoardImpl(OuterLimit screen) {
         this.screen = screen;
         this.paintList = new LinkedList<>();
-        this.CurrentLocation = new Point(0f,0f);
-        this.Size = new Point(320f,180f);
+        this.CurrentLocation = new Point(0f, 0f);
+        this.Size = new Point(320f, 180f);
     }
 
     @Override
@@ -77,7 +76,7 @@ public class BoardImpl implements CollidableBox, TickReceiver {
     }
 
     public Point GetRelativeLocation(Point absLoc) {
-        return new Point(absLoc.getX()-CurrentLocation.getX(),absLoc.getY()-CurrentLocation.getY());
+        return new Point(absLoc.getX() - CurrentLocation.getX(), absLoc.getY() - CurrentLocation.getY());
     }
 
     //paint's Location is relative to canvas
@@ -88,17 +87,22 @@ public class BoardImpl implements CollidableBox, TickReceiver {
     @Override
     public void Tick(Float tickScaler) {
         //Bound Check and update speed
-        Point loc = new Point(CurrentLocation.getX() + MovementVector.getX() * tickScaler,CurrentLocation.getY() + MovementVector.getY() *tickScaler);
+        Point loc = new Point(CurrentLocation.getX() + MovementVector.getX() * tickScaler, CurrentLocation.getY() + MovementVector.getY() * tickScaler);
 
-        if (!CollideJudgment.IsIntersectionExist(this, screen)){
-            if (Pointutil.isHittingTopOrBottom(screen.GetPrincipleLocation(),loc)){
-                MovementVector.setY( - MovementVector.getY());
+        if (!CollideJudgment.IsIntersectionExist(new CollidableBoxImpl(loc, this.Size), screen)) {
+            if (loc.getY() > screen.GetPrincipleLocation().getY()) {
+                MovementVector.setY(-Math.abs(MovementVector.getY()));
+            } else {
+                MovementVector.setY(Math.abs(MovementVector.getY()));
             }
-            if (Pointutil.isHittingLeftOrRight(screen.GetPrincipleLocation(),loc)){
-                MovementVector.setX( - MovementVector.getX());
+
+            if (loc.getX() > screen.GetPrincipleLocation().getX()) {
+                MovementVector.setX(-Math.abs(MovementVector.getX()));
+            } else {
+                MovementVector.setX(Math.abs(MovementVector.getX()));
             }
-        }else{
-            CurrentLocation = loc;
         }
+        CurrentLocation = loc;
+
     }
 }
