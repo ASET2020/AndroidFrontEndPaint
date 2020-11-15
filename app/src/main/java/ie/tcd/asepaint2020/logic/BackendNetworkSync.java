@@ -22,12 +22,18 @@ public class BackendNetworkSync implements NetworkSync{
     String Endpoint = "://42.42.43.12:8080/";
     Boolean MatchMakingFinished = false;
 
+    Boolean GameReady = false;
+
+    private Float StartTime;
+
     Integer seed;
     Integer userColor;
     Integer roundID;
     Integer userID;
 
     Handler handler = new Handler();
+
+    String flashmsg;
 
     public BackendNetworkSync() {
         new Thread(new Runnable(){
@@ -81,13 +87,41 @@ public class BackendNetworkSync implements NetworkSync{
             Log.d("BackendNetworkSync", text );
             final NetworkPaintSync np = new NetworkPaintSync();
             try {
-                np.FromJson(text);
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        buf.add(np);
-                    }
-                });
+                if(text.startsWith("success")){
+                    MatchMakingFinished = true;
+                    return;
+                }
+                JSONObject jo = new JSONObject(text);
+                String Event = jo.getString("eventType");
+                switch (Event){
+                    case "connect":
+                        break;
+                    case "gameStart":
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                GameReady = true;
+                            }
+                        });
+                        break;
+                    case "HitNeg":
+                        flashmsg = "Missed";
+                        break;
+                    case "HitPos":
+                        flashmsg = "Hitted";
+                        np.FromJson(text);
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                buf.add(np);
+                            }
+                        });
+                        break;
+                    default:
+                        Log.d("BackendNetworkSync","Unknown Event Type" + Event );
+                        return;
+                }
+
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -121,7 +155,11 @@ public class BackendNetworkSync implements NetworkSync{
 
     @Override
     public Float GetTimeBeforeGameStart() {
-        return 1f;
+        if (!GameReady){
+            return 1f;
+        }
+        StartTime = Float.valueOf(System.currentTimeMillis());
+        return (StartTime - Float.valueOf(System.currentTimeMillis())) / 1000f;
     }
 
     @Override
@@ -141,6 +179,12 @@ public class BackendNetworkSync implements NetworkSync{
         return bufv;
     }
 
+    public String GetFlashMsg(){
+        String fm = flashmsg;
+        flashmsg = null;
+        return fm;
+    }
+
 }
 class NetworkPaintSync implements NetworkPaint {
     public String Event;
@@ -152,7 +196,7 @@ class NetworkPaintSync implements NetworkPaint {
         Event = jo.getString("eventType");
         JSONObject detail = jo.getJSONObject("detail");
         Size = detail.getInt("Size");
-        ID = detail.getInt("ID");
+        //ID = detail.getInt("ID");
         Location = new Point((float)detail.getInt("LocationX"),(float)detail.getInt("LocationY"));
     }
     public String ToJson() throws JSONException {
@@ -161,24 +205,24 @@ class NetworkPaintSync implements NetworkPaint {
         JSONObject detail = new JSONObject();
         detail.put("Size",Size);
         detail.put("ID",ID);
-        detail.put("LocationX",Location.getX());
-        detail.put("LocationY",Location.getY());
-        jo.put("detail",jo);
+        detail.put("LocationX",Math.round(Location.getX()));
+        detail.put("LocationY",Math.round(Location.getY()));
+        jo.put("detail",detail);
         return jo.toString();
 
     }
     @Override
     public Integer OwnerID() {
-        return null;
+        return 0;
     }
 
     @Override
     public Point Location() {
-        return null;
+        return Location;
     }
 
     @Override
     public Float Size() {
-        return null;
+        return (float)Size;
     }
 }
