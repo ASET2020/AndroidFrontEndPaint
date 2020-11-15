@@ -16,13 +16,21 @@ import ie.tcd.asepaint2020.event.StartGameEvent;
 import ie.tcd.asepaint2020.fragment.GameFragment;
 import ie.tcd.asepaint2020.fragment.LobbyFragment;
 import ie.tcd.asepaint2020.fragment.NameInputFragment;
+import ie.tcd.asepaint2020.logic.BackendNetworkSync;
+import ie.tcd.asepaint2020.logic.GameStatus;
+import ie.tcd.asepaint2020.logic.GameStatusImpl;
 
 public class MainActivity extends AppCompatActivity {
+
+    private GameStatus gs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        gs = new GameStatusImpl(new BackendNetworkSync());
+
         EventBus.getDefault().register(this);
         replaceFragment(new NameInputFragment());
     }
@@ -50,5 +58,9 @@ public class MainActivity extends AppCompatActivity {
     public void startGame(StartGameEvent event) {
         // TODO: 09/11/2020  should have game init data
         replaceFragment(new GameFragment());
+    }
+
+    public GameStatus getGameStatus() {
+        return gs;
     }
 }

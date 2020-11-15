@@ -9,6 +9,9 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import ie.tcd.asepaint2020.MainActivity;
+import ie.tcd.asepaint2020.logic.GameStatus;
+
 
 abstract class BaseFragment extends Fragment {
     @Nullable
@@ -22,4 +25,8 @@ abstract class BaseFragment extends Fragment {
     abstract int getLayoutId();
 
     abstract void initView(View view);
+
+    public GameStatus getGameStatus() {
+        return ((MainActivity) getActivity()).getGameStatus();
+    }
 }
