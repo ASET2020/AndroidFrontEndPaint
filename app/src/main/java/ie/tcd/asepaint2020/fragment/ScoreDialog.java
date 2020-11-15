@@ -72,6 +72,7 @@ public class ScoreDialog extends Dialog {
         for (Map.Entry<String, Integer> entry : nameScoreMap.entrySet()) {
             tvNames[i].setText(entry.getKey());
             tvScores[i].setText(entry.getValue());
+            i++;
         }
         show();
     }
