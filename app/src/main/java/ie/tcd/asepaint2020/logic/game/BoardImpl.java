@@ -30,7 +30,7 @@ public class BoardImpl implements CollidableBox, TickReceiver {
         this.screen = screen;
         this.paintList = new LinkedList<>();
         this.CurrentLocation = new Point(0f, 0f);
-        this.Size = new Point(320f, 180f);
+        this.Size = new Point(512f, 680f);
     }
 
     @Override

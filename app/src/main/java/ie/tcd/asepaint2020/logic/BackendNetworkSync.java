@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-public class BackendNetworkSync implements NetworkSync{
+public class BackendNetworkSync implements NetworkSync, NetworkSyncX {
     OkHttpClient client = new OkHttpClient();
     String Endpoint = "://42.42.43.12:8080/";
     Boolean MatchMakingFinished = false;
@@ -179,6 +179,7 @@ public class BackendNetworkSync implements NetworkSync{
         return bufv;
     }
 
+    @Override
     public String GetFlashMsg(){
         String fm = flashmsg;
         flashmsg = null;
