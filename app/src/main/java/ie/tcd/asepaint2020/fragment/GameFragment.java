@@ -17,6 +17,7 @@ import java.util.TimerTask;
 
 import ie.tcd.asepaint2020.R;
 import ie.tcd.asepaint2020.common.GameInput;
+import ie.tcd.asepaint2020.logic.BackendNetworkSync;
 import ie.tcd.asepaint2020.logic.GameStatus;
 import ie.tcd.asepaint2020.logic.GameStatusImpl;
 import ie.tcd.asepaint2020.logic.LocalPlayNetworkSync;
@@ -91,7 +92,7 @@ public class GameFragment extends BaseFragment {
 
         //board.startMove(60);
 
-        this.gs = new GameStatusImpl(new LocalPlayNetworkSync());
+        this.gs = new GameStatusImpl(new BackendNetworkSync());
         view.getRootView().post(new Runnable() {
             @Override
             public void run() {
