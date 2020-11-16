@@ -11,12 +11,15 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.util.Timer;
 import java.util.TimerTask;
 
 import ie.tcd.asepaint2020.MainActivity;
 import ie.tcd.asepaint2020.R;
 import ie.tcd.asepaint2020.common.GameInput;
+import ie.tcd.asepaint2020.event.NameInputEvent;
 import ie.tcd.asepaint2020.logic.GameStatus;
 import io.github.controlwear.virtual.joystick.android.JoystickView;
 
@@ -173,6 +176,7 @@ public class GameFragment extends BaseFragment {
                                 public void onClick(View view) {
                                     isDialogShowing = false;
                                     dialog.dismiss();
+                                    EventBus.getDefault().post(new NameInputEvent());
                                 }
                             });
 
