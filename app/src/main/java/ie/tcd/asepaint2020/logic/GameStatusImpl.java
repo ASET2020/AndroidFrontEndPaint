@@ -129,17 +129,21 @@ public class GameStatusImpl implements GameStatus, ViewPointTranslator, TickRece
     }
 
     public void updateInternal() {
-        if (Viewpoint == null) {
-            return;
-        }
+
         if ((ns.IsMatchMakingFinished() && this.SecondsAfterGameStart == null) || (this.SecondsAfterGameStart != null && this.SecondsAfterGameStart <= 0)) {
             this.SecondsAfterGameStart = -ns.GetTimeBeforeGameStart();
+            if (Viewpoint == null) {
+                return;
+            }
             this.remotePlayers = ns.GetPlayers();
             if (this.SecondsAfterGameStart >= 0) {
                 if (CanvasBoard == null) {
                     initGame();
                 }
             }
+        }
+        if (Viewpoint == null) {
+            return;
         }
         if (this.SecondsAfterGameStart != null && this.SecondsAfterGameStart >= 0) {
             mt.Pulse(this);
@@ -336,6 +340,7 @@ public class GameStatusImpl implements GameStatus, ViewPointTranslator, TickRece
 
     @Override
     public Float TimeBeforeGameStart() {
+        updateInternal();
         if (SecondsAfterGameStart == null) {
             return -2f;
         }

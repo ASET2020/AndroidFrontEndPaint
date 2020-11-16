@@ -4,5 +4,7 @@
         <domain includeSubdomains="true">localhost</domain>
         <domain includeSubdomains="true">kkdev.org</domain>
         <domain includeSubdomains="true">42.42.43.12</domain>
+        <domain includeSubdomains="true">192.168.0.45</domain>
+
     </domain-config>
 </network-security-config>
