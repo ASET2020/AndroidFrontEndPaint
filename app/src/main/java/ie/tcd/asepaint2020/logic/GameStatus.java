@@ -9,4 +9,6 @@ public interface GameStatus {
     GameBoard GetGameStatus();
     void SubmitMovement(GameInput input);
     Cursor GetCursor();
+    String GetFlashMsg();
+    void OpenConnection(String s);
 }

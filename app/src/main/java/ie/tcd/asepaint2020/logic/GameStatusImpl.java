@@ -45,9 +45,13 @@ public class GameStatusImpl implements GameStatus, ViewPointTranslator, TickRece
     private List<RemotePlayer> remotePlayers;
 
     private NetworkSync ns;
+    private NetworkSyncFactory nsf;
 
-    public GameStatusImpl(NetworkSync ns) {
-        this.ns = ns;
+    private String Flashmsg = "";
+    private Float Flashremain = 0f;
+
+    public GameStatusImpl(NetworkSyncFactory ns) {
+        this.nsf = ns;
     }
 
     @Override
@@ -114,6 +118,16 @@ public class GameStatusImpl implements GameStatus, ViewPointTranslator, TickRece
         return new CursorInt(CursorLocationVector, CursorSize);
     }
 
+    @Override
+    public String GetFlashMsg() {
+        return Flashmsg;
+    }
+
+    @Override
+    public void OpenConnection(String s) {
+        ns = nsf.Create(s);
+    }
+
     public void updateInternal() {
         if (Viewpoint == null) {
             return;
@@ -170,6 +184,21 @@ public class GameStatusImpl implements GameStatus, ViewPointTranslator, TickRece
             ShootingCooldownRemain = 0f;
         }
 
+        Flashremain -= tickScaler;
+        if (Flashremain < 0) {
+            Flashremain = 0f;
+            Flashmsg = "";
+        }
+
+        if(NetworkSyncX.class.isAssignableFrom(ns.getClass())){
+            NetworkSyncX nsx = (NetworkSyncX) ns;
+            String fsg = nsx.GetFlashMsg();
+            if(fsg!=null){
+                Flashmsg = fsg;
+                Flashremain = 1f;
+            }
+
+        }
 
         //Cursor Movement Attrition
 
@@ -215,6 +244,9 @@ public class GameStatusImpl implements GameStatus, ViewPointTranslator, TickRece
                 boolean hit = CanvasBoard.JudgePaintHitOrMiss(cc);
                 if (hit) {
                     submitHitToServer(cc);
+                }else {
+                    Flashmsg = "Missed";
+                    Flashremain = 1f;
                 }
             }
         }

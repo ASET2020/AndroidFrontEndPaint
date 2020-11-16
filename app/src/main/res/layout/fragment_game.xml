@@ -41,14 +41,6 @@
             android:layout_width="30dp"
             android:layout_height="30dp" />
 
-        <TextView
-            android:id="@+id/tv_shoot_tip"
-            android:text=""
-            android:layout_alignParentRight="true"
-            android:layout_marginTop="-20dp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content" />
-
     </RelativeLayout>
 
 
@@ -86,6 +78,13 @@
         </RelativeLayout>
 
     </LinearLayout>
+    <TextView
+            android:id="@+id/tv_shoot_tip"
+            android:text="Demo"
+            android:layout_marginTop="-20dp"
+            android:layout_width="129dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="9dp"/>
 
 
 </LinearLayout>

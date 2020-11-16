@@ -13,6 +13,7 @@ import androidx.annotation.Nullable;
 import java.util.List;
 
 import ie.tcd.asepaint2020.logic.GameStatus;
+import ie.tcd.asepaint2020.logic.internal.Collidable;
 
 public class GameBoardView extends View {
 
@@ -65,6 +66,16 @@ public class GameBoardView extends View {
                 switch (pclor) {
                     case "Blue":
                         paint.setColor(Color.BLUE);
+                        break;
+                    case "Green":
+                        paint.setColor(Color.GREEN);
+                        break;
+                    case "Red":
+                        paint.setColor(Color.RED);
+                        break;
+                    case "Orange":
+                        paint.setColor(Color.YELLOW);
+                        break;
                 }
 
                 canvas.drawCircle(left + hit.LocationX(), top + hit.LocationY() , hit.Size(), paint);

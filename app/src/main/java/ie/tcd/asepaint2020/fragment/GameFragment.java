@@ -174,6 +174,9 @@ public class GameFragment extends BaseFragment {
                         View parent = (View) cursor.getParent();
                         parent.scrollTo(Math.round(cursor.getLeft() - gs.GetCursor().GetX() + cursor.getWidth() / 2f),
                                 Math.round(cursor.getTop() - gs.GetCursor().GetY() + + cursor.getHeight() / 2f));
+
+                        changeTips(gs.GetFlashMsg());
+
                         board.invalidate();
                     }
                 });
