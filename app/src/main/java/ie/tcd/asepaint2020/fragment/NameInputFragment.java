@@ -7,12 +7,14 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import org.greenrobot.eventbus.EventBus;
 
 import ie.tcd.asepaint2020.MainActivity;
 import ie.tcd.asepaint2020.R;
 import ie.tcd.asepaint2020.event.EnterLobbyEvent;
+import ie.tcd.asepaint2020.utils.NetworkUtil;
 
 
 /**
@@ -64,6 +66,10 @@ public class NameInputFragment extends BaseFragment {
      */
     private void submitUserName(String text) {
         if (TextUtils.isEmpty(text)) {
+            return;
+        }
+        if (!NetworkUtil.isNetworkConnected(getContext())) {
+            Toast.makeText(getContext(), "You're offline. Check your connection", Toast.LENGTH_SHORT).show();
             return;
         }
         ((MainActivity) getActivity()).getGameStatus().OpenConnection(text);
