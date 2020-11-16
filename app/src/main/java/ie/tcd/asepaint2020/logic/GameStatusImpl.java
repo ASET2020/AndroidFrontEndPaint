@@ -1,13 +1,25 @@
 package ie.tcd.asepaint2020.logic;
 
-import ie.tcd.asepaint2020.common.Player;
-import ie.tcd.asepaint2020.common.*;
-import ie.tcd.asepaint2020.logic.game.*;
-import ie.tcd.asepaint2020.logic.internal.*;
-
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+
+import ie.tcd.asepaint2020.common.Cursor;
+import ie.tcd.asepaint2020.common.GameBoard;
+import ie.tcd.asepaint2020.common.GameInput;
+import ie.tcd.asepaint2020.common.Paint;
+import ie.tcd.asepaint2020.logic.game.BoardImpl;
+import ie.tcd.asepaint2020.logic.game.LocalPlayer;
+import ie.tcd.asepaint2020.logic.game.OuterLimit;
+import ie.tcd.asepaint2020.logic.game.PaintImpl;
+import ie.tcd.asepaint2020.logic.game.RemotePlayer;
+import ie.tcd.asepaint2020.logic.internal.AllCollideJudgements;
+import ie.tcd.asepaint2020.logic.internal.CollidableCircle;
+import ie.tcd.asepaint2020.logic.internal.CollidableCircleImpl;
+import ie.tcd.asepaint2020.logic.internal.Metronome;
+import ie.tcd.asepaint2020.logic.internal.Point;
+import ie.tcd.asepaint2020.logic.internal.TickReceiver;
+import ie.tcd.asepaint2020.logic.internal.ViewPointTranslator;
 
 public class GameStatusImpl implements GameStatus, ViewPointTranslator, TickReceiver, GameBoard {
     private static final int ScreenPointX = 1080;
@@ -129,17 +141,21 @@ public class GameStatusImpl implements GameStatus, ViewPointTranslator, TickRece
     }
 
     public void updateInternal() {
-        if (Viewpoint == null) {
-            return;
-        }
+
         if ((ns.IsMatchMakingFinished() && this.SecondsAfterGameStart == null) || (this.SecondsAfterGameStart != null && this.SecondsAfterGameStart <= 0)) {
             this.SecondsAfterGameStart = -ns.GetTimeBeforeGameStart();
+            if (Viewpoint == null) {
+                return;
+            }
             this.remotePlayers = ns.GetPlayers();
             if (this.SecondsAfterGameStart >= 0) {
                 if (CanvasBoard == null) {
                     initGame();
                 }
             }
+        }
+        if (Viewpoint == null) {
+            return;
         }
         if (this.SecondsAfterGameStart != null && this.SecondsAfterGameStart >= 0) {
             mt.Pulse(this);
@@ -336,6 +352,7 @@ public class GameStatusImpl implements GameStatus, ViewPointTranslator, TickRece
 
     @Override
     public Float TimeBeforeGameStart() {
+        updateInternal();
         if (SecondsAfterGameStart == null) {
             return -2f;
         }
@@ -349,24 +366,19 @@ public class GameStatusImpl implements GameStatus, ViewPointTranslator, TickRece
 
     @Override
     public Boolean IsGameEnded() {
-        return !GameNotEnded();
-    }
-
-    @Override
-    public Player GetOwnStatus() {
-        return LocalPlayer;
-    }
-
-    @Override
-    public List<Player> GetAllStatus() {
-        List<Player> ret = new ArrayList<>();
-        ret.add(LocalPlayer);
-        if (remotePlayers != null) {
-            for (RemotePlayer rp : remotePlayers
-            ) {
-                ret.add(rp);
-            }
+        if (NetworkSyncX.class.isAssignableFrom(ns.getClass())) {
+            NetworkSyncX nsx = (NetworkSyncX) ns;
+            return nsx.IsGameOvered();
         }
-        return ret;
+        return false;
+    }
+
+    @Override
+    public Map<String, Integer> GetGameResult() {
+        if (NetworkSyncX.class.isAssignableFrom(ns.getClass())) {
+            NetworkSyncX nsx = (NetworkSyncX) ns;
+            return nsx.GetGameResult();
+        }
+        return null;
     }
 }

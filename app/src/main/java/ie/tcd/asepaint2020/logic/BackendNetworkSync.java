@@ -3,16 +3,27 @@ package ie.tcd.asepaint2020.logic;
 
 import android.os.Handler;
 import android.util.Log;
-import ie.tcd.asepaint2020.logic.game.RemotePlayer;
-import ie.tcd.asepaint2020.logic.internal.CollidableCircle;
-import ie.tcd.asepaint2020.logic.internal.Point;
-import okhttp3.*;
+
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import ie.tcd.asepaint2020.logic.game.RemotePlayer;
+import ie.tcd.asepaint2020.logic.internal.CollidableCircle;
+import ie.tcd.asepaint2020.logic.internal.Point;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.WebSocket;
+import okhttp3.WebSocketListener;
 
 public class BackendNetworkSync implements NetworkSync, NetworkSyncX {
     OkHttpClient client = new OkHttpClient();
@@ -20,6 +31,7 @@ public class BackendNetworkSync implements NetworkSync, NetworkSyncX {
     Boolean MatchMakingFinished = false;
 
     Boolean GameReady = false;
+    Boolean GameOver = false;
 
     String userNickName = "Nameless Hero";
 
@@ -36,6 +48,8 @@ public class BackendNetworkSync implements NetworkSync, NetworkSyncX {
 
     Map<Integer, RemotePlayer> playerMap = new HashMap<>();
     Map<Integer, Integer> playerIDMap = new HashMap<>();
+
+    Map<String, Integer> scoreboard = new HashMap<>();
 
     public BackendNetworkSync(String name) {
         userNickName = name;
@@ -138,6 +152,29 @@ public class BackendNetworkSync implements NetworkSync, NetworkSyncX {
                             }
                         });
                         break;
+                    case "gameOver":
+                        handler.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                JSONObject UsernameObj = null;
+                                try {
+                                    UsernameObj = jo.getJSONObject("score");
+
+                                    Integer i = 0;
+                                    for (Iterator<String> it = UsernameObj.keys(); it.hasNext(); ) {
+                                        i++;
+                                        String s = it.next();
+
+                                        scoreboard.put(s, UsernameObj.getInt(s));
+                                    }
+
+                                    GameOver = true;
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        });
+                        break;
                     default:
                         Log.d("BackendNetworkSync", "Unknown Event Type" + Event);
                         return;
@@ -216,6 +253,16 @@ public class BackendNetworkSync implements NetworkSync, NetworkSyncX {
         String fm = flashmsg;
         flashmsg = null;
         return fm;
+    }
+
+    @Override
+    public Boolean IsGameOvered() {
+        return GameOver;
+    }
+
+    @Override
+    public Map<String, Integer> GetGameResult() {
+        return scoreboard;
     }
 
     class NetworkPaintSync implements NetworkPaint {
