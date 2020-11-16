@@ -27,7 +27,7 @@ import okhttp3.WebSocketListener;
 
 public class BackendNetworkSync implements NetworkSync, NetworkSyncX {
     OkHttpClient client = new OkHttpClient();
-    String Endpoint = "://42.42.43.12:8080/";
+    String Endpoint = "://asepaint.kkdev.org:8080/";
     Boolean MatchMakingFinished = false;
 
     Boolean GameReady = false;
