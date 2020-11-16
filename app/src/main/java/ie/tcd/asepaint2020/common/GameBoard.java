@@ -17,5 +17,6 @@ public interface GameBoard {
     Float TimeBeforeGameStart();
 
     Boolean IsGameEnded();
-    Map<String,Integer> GetGameResult();
+
+    Map<String, Integer> GetGameResult();
 }

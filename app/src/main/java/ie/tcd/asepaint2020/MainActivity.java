@@ -7,17 +7,21 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import ie.tcd.asepaint2020.event.NameInputEvent;
-import ie.tcd.asepaint2020.logic.*;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import ie.tcd.asepaint2020.event.EnterLobbyEvent;
+import ie.tcd.asepaint2020.event.NameInputEvent;
 import ie.tcd.asepaint2020.event.StartGameEvent;
 import ie.tcd.asepaint2020.fragment.GameFragment;
 import ie.tcd.asepaint2020.fragment.LobbyFragment;
 import ie.tcd.asepaint2020.fragment.NameInputFragment;
+import ie.tcd.asepaint2020.logic.BackendNetworkSync;
+import ie.tcd.asepaint2020.logic.GameStatus;
+import ie.tcd.asepaint2020.logic.GameStatusImpl;
+import ie.tcd.asepaint2020.logic.NetworkSync;
+import ie.tcd.asepaint2020.logic.NetworkSyncFactory;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -54,13 +58,11 @@ public class MainActivity extends AppCompatActivity {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void enterLobby(EnterLobbyEvent event) {
-        // TODO: 09/11/2020  new LobbyFragment should have user name parameters
         replaceFragment(new LobbyFragment());
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void startGame(StartGameEvent event) {
-        // TODO: 09/11/2020  should have game init data
         replaceFragment(new GameFragment());
     }
 
@@ -76,7 +78,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public GameStatus getGameStatus(Boolean reset) {
-        if(reset){
+        if (reset) {
             gs = new GameStatusImpl(new NetworkSyncFactory() {
                 @Override
                 public NetworkSync Create(String Username) {

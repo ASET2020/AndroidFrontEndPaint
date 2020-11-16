@@ -3,16 +3,27 @@ package ie.tcd.asepaint2020.logic;
 
 import android.os.Handler;
 import android.util.Log;
-import ie.tcd.asepaint2020.logic.game.RemotePlayer;
-import ie.tcd.asepaint2020.logic.internal.CollidableCircle;
-import ie.tcd.asepaint2020.logic.internal.Point;
-import okhttp3.*;
+
 import org.jetbrains.annotations.NotNull;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+
+import ie.tcd.asepaint2020.logic.game.RemotePlayer;
+import ie.tcd.asepaint2020.logic.internal.CollidableCircle;
+import ie.tcd.asepaint2020.logic.internal.Point;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+import okhttp3.WebSocket;
+import okhttp3.WebSocketListener;
 
 public class BackendNetworkSync implements NetworkSync, NetworkSyncX {
     OkHttpClient client = new OkHttpClient();
@@ -154,7 +165,7 @@ public class BackendNetworkSync implements NetworkSync, NetworkSyncX {
                                         i++;
                                         String s = it.next();
 
-                                        scoreboard.put(s,UsernameObj.getInt(s));
+                                        scoreboard.put(s, UsernameObj.getInt(s));
                                     }
 
                                     GameOver = true;

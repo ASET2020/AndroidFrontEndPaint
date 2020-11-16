@@ -6,8 +6,8 @@ android {
 
     defaultConfig {
         applicationId "ie.tcd.asepaint2020"
-        minSdkVersion 28
-        targetSdkVersion 30
+        minSdkVersion 23
+        targetSdkVersion 26
         versionCode 1
         versionName "1.0"
 

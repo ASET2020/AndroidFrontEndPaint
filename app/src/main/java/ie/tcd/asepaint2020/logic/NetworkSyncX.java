@@ -4,6 +4,8 @@ import java.util.Map;
 
 public interface NetworkSyncX {
     String GetFlashMsg();
+
     Boolean IsGameOvered();
-    Map<String,Integer> GetGameResult();
+
+    Map<String, Integer> GetGameResult();
 }

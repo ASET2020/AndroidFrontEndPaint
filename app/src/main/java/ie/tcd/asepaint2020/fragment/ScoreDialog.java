@@ -11,20 +11,25 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import ie.tcd.asepaint2020.event.NameInputEvent;
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.Map;
 
 import ie.tcd.asepaint2020.R;
-import ie.tcd.asepaint2020.event.EnterLobbyEvent;
+import ie.tcd.asepaint2020.event.NameInputEvent;
 
+/**
+ * the dialog for final results
+ */
 public class ScoreDialog extends Dialog {
 
-    TextView[] tvNames = new TextView[4];
-    TextView[] tvScores = new TextView[4];
+    private static final int MAX_USERS = 4;
 
-    Button btnBack;
+    // user names and use scores
+    private TextView[] tvNames = new TextView[MAX_USERS];
+    private TextView[] tvScores = new TextView[MAX_USERS];
+
+    private Button btnBack;
 
     public ScoreDialog(@NonNull Context context) {
         super(context);
@@ -64,8 +69,11 @@ public class ScoreDialog extends Dialog {
         });
 
         int i = 0;
+        if (nameScoreMap == null) {
+            return;
+        }
         for (Map.Entry<String, Integer> entry : nameScoreMap.entrySet()) {
-            if(i>=4){
+            if (i >= 4) {
                 break;
             }
             tvNames[i].setText(entry.getKey());
@@ -74,7 +82,9 @@ public class ScoreDialog extends Dialog {
         }
 
     }
+
     Map<String, Integer> nameScoreMap;
+
     public void showScores(Map<String, Integer> nameScoreMap) {
         if (nameScoreMap == null) {
             return;
