@@ -51,6 +51,8 @@ public class GameFragment extends BaseFragment {
     // the tip for hitting results
     private TextView tvShootTip;
 
+    private boolean isDialogShowing;
+
     GameInput gi = new GameInput() {
         @Override
         public Boolean IsMoving() {
@@ -161,8 +163,19 @@ public class GameFragment extends BaseFragment {
 
                         changeTips(gs.GetFlashMsg());
 
-                        if (gs.GetGameStatus().IsGameEnded()) {
-                            new ScoreDialog(getContext()).showScores(gs.GetGameStatus().GetGameResult());
+
+                        if (gs.GetGameStatus().IsGameEnded() && !isDialogShowing) {
+                            final ScoreDialog dialog = new ScoreDialog(getContext());
+                            dialog.showScores(gs.GetGameStatus().GetGameResult());
+                            isDialogShowing = true;
+                            dialog.findViewById(R.id.btn_back_lobby).setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    isDialogShowing = false;
+                                    dialog.dismiss();
+                                }
+                            });
+
                             myt.cancel();
                             ((MainActivity) getActivity()).getGameStatus(true);
                         }

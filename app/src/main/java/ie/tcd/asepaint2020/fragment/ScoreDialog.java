@@ -4,19 +4,15 @@ package ie.tcd.asepaint2020.fragment;
 import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
-import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import org.greenrobot.eventbus.EventBus;
-
 import java.util.Map;
 
 import ie.tcd.asepaint2020.R;
-import ie.tcd.asepaint2020.event.NameInputEvent;
 
 /**
  * the dialog for final results
@@ -58,16 +54,6 @@ public class ScoreDialog extends Dialog {
         tvScores[2] = findViewById(R.id.tv_score3);
         tvScores[3] = findViewById(R.id.tv_score4);
 
-        btnBack = findViewById(R.id.btn_back_lobby);
-
-        btnBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                EventBus.getDefault().post(new NameInputEvent());
-                dismiss();
-            }
-        });
-
         int i = 0;
         if (nameScoreMap == null) {
             return;
@@ -93,7 +79,4 @@ public class ScoreDialog extends Dialog {
         show();
     }
 
-    public void setBtnBackClickListener(View.OnClickListener listener) {
-        btnBack.setOnClickListener(listener);
-    }
 }
