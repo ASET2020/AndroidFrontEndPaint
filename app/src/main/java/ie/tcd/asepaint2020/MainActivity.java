@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import ie.tcd.asepaint2020.event.NameInputEvent;
 import ie.tcd.asepaint2020.logic.*;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -63,7 +64,26 @@ public class MainActivity extends AppCompatActivity {
         replaceFragment(new GameFragment());
     }
 
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void enterName(NameInputEvent event) {
+        // TODO: 09/11/2020  new LobbyFragment should have user name parameters
+        replaceFragment(new NameInputFragment());
+    }
+
     public GameStatus getGameStatus() {
+        return gs;
+    }
+
+    public GameStatus getGameStatus(Boolean reset) {
+        if(reset){
+            gs = new GameStatusImpl(new NetworkSyncFactory() {
+                @Override
+                public NetworkSync Create(String Username) {
+                    return new BackendNetworkSync(Username);
+                }
+            });
+        }
         return gs;
     }
 }

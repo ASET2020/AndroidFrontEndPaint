@@ -15,6 +15,7 @@ import android.widget.TextView;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import ie.tcd.asepaint2020.MainActivity;
 import ie.tcd.asepaint2020.R;
 import ie.tcd.asepaint2020.common.GameInput;
 import ie.tcd.asepaint2020.logic.GameStatus;
@@ -176,6 +177,12 @@ public class GameFragment extends BaseFragment {
                                 Math.round(cursor.getTop() - gs.GetCursor().GetY() + + cursor.getHeight() / 2f));
 
                         changeTips(gs.GetFlashMsg());
+
+                        if(gs.GetGameStatus().IsGameEnded()){
+                            new ScoreDialog(getContext()).showScores(gs.GetGameStatus().GetGameResult());
+                            myt.cancel();
+                            ((MainActivity) getActivity()).getGameStatus(true);
+                        }
 
                         board.invalidate();
                     }

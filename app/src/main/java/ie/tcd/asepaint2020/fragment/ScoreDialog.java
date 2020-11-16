@@ -11,6 +11,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import ie.tcd.asepaint2020.event.NameInputEvent;
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.Map;
@@ -57,23 +58,28 @@ public class ScoreDialog extends Dialog {
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                EventBus.getDefault().post(new EnterLobbyEvent());
+                EventBus.getDefault().post(new NameInputEvent());
                 dismiss();
             }
         });
 
-    }
+        int i = 0;
+        for (Map.Entry<String, Integer> entry : nameScoreMap.entrySet()) {
+            if(i>=4){
+                break;
+            }
+            tvNames[i].setText(entry.getKey());
+            tvScores[i].setText(entry.getValue().toString());
+            i++;
+        }
 
+    }
+    Map<String, Integer> nameScoreMap;
     public void showScores(Map<String, Integer> nameScoreMap) {
         if (nameScoreMap == null) {
             return;
         }
-        int i = 0;
-        for (Map.Entry<String, Integer> entry : nameScoreMap.entrySet()) {
-            tvNames[i].setText(entry.getKey());
-            tvScores[i].setText(entry.getValue());
-            i++;
-        }
+        this.nameScoreMap = nameScoreMap;
         show();
     }
 
