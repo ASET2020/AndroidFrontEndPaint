@@ -108,7 +108,7 @@
     <Button
         android:layout_marginTop="50dp"
         android:id="@+id/btn_back_lobby"
-        android:text="Back To Lobby"
+        android:text="Restart Game"
         android:background="@drawable/selector_common_btn"
         android:layout_width="wrap_content"
         android:padding="10dp"
