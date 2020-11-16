@@ -2,7 +2,6 @@ package ie.tcd.asepaint2020.logic;
 
 
 import android.os.Handler;
-import android.util.JsonReader;
 import android.util.Log;
 import ie.tcd.asepaint2020.logic.game.RemotePlayer;
 import ie.tcd.asepaint2020.logic.internal.CollidableCircle;
@@ -13,9 +12,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class BackendNetworkSync implements NetworkSync, NetworkSyncX {
     OkHttpClient client = new OkHttpClient();
@@ -23,6 +20,8 @@ public class BackendNetworkSync implements NetworkSync, NetworkSyncX {
     Boolean MatchMakingFinished = false;
 
     Boolean GameReady = false;
+
+    String userNickName = "Nameless Hero";
 
     private Float StartTime;
 
@@ -35,8 +34,11 @@ public class BackendNetworkSync implements NetworkSync, NetworkSyncX {
 
     String flashmsg;
 
+    Map<Integer, RemotePlayer> playerMap = new HashMap<>();
+    Map<Integer, Integer> playerIDMap = new HashMap<>();
+
     public BackendNetworkSync() {
-        new Thread(new Runnable(){
+        new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -51,7 +53,7 @@ public class BackendNetworkSync implements NetworkSync, NetworkSyncX {
                                 roundID = resp.getInt("roundId");
                                 userID = resp.getInt("userId");
                                 MatchMakingFinished = true;
-                                Log.d("BackendNetworkSync",s);
+                                Log.d("BackendNetworkSync", s);
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
@@ -59,8 +61,7 @@ public class BackendNetworkSync implements NetworkSync, NetworkSyncX {
                     });
                     Integer userID = resp.getInt("userId");
                     startws(userID);
-                }
-                catch (Exception ex) {
+                } catch (Exception ex) {
                     ex.printStackTrace();
                 }
             }
@@ -78,29 +79,46 @@ public class BackendNetworkSync implements NetworkSync, NetworkSyncX {
         @Override
         public void onOpen(@NotNull WebSocket webSocket, @NotNull Response response) {
             super.onOpen(webSocket, response);
-            Log.d("BackendNetworkSync",response.toString());
+            Log.d("BackendNetworkSync", response.toString());
         }
 
         @Override
         public void onMessage(@NotNull WebSocket webSocket, @NotNull String text) {
             super.onMessage(webSocket, text);
-            Log.d("BackendNetworkSync", text );
+            Log.d("BackendNetworkSync", text);
             final NetworkPaintSync np = new NetworkPaintSync();
             try {
-                if(text.startsWith("success")){
+                if (text.startsWith("success")) {
                     MatchMakingFinished = true;
                     return;
                 }
-                JSONObject jo = new JSONObject(text);
+                final JSONObject jo = new JSONObject(text);
                 String Event = jo.getString("eventType");
-                switch (Event){
+                switch (Event) {
                     case "connect":
                         break;
                     case "gameStart":
                         handler.post(new Runnable() {
                             @Override
                             public void run() {
-                                GameReady = true;
+                                JSONObject UsernameObj = null;
+                                try {
+                                    UsernameObj = jo.getJSONObject("userName");
+
+                                    Integer i = 0;
+                                    for (Iterator<String> it = UsernameObj.keys(); it.hasNext(); ) {
+                                        i++;
+                                        String s = it.next();
+                                        Integer thispid = Integer.valueOf(s);
+                                        playerIDMap.put(thispid, i);
+                                        RemotePlayer rp = new RemotePlayer(i, UsernameObj.getString(s));
+                                        playerMap.put(thispid, rp);
+                                    }
+
+                                    GameReady = true;
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
                             }
                         });
                         break;
@@ -108,8 +126,10 @@ public class BackendNetworkSync implements NetworkSync, NetworkSyncX {
                         flashmsg = "Missed";
                         break;
                     case "HitPos":
-                        flashmsg = "Hitted";
                         np.FromJson(text);
+                        if (np.ID == userID) {
+                            flashmsg = "Hitted";
+                        }
                         handler.post(new Runnable() {
                             @Override
                             public void run() {
@@ -118,7 +138,7 @@ public class BackendNetworkSync implements NetworkSync, NetworkSyncX {
                         });
                         break;
                     default:
-                        Log.d("BackendNetworkSync","Unknown Event Type" + Event );
+                        Log.d("BackendNetworkSync", "Unknown Event Type" + Event);
                         return;
                 }
 
@@ -127,16 +147,18 @@ public class BackendNetworkSync implements NetworkSync, NetworkSyncX {
             }
         }
     }
+
     WebSocket ws;
-    private void startws(Integer userID){
-        Request request = new Request.Builder().url("ws" + Endpoint + "websocket/" + userID.toString()).build();
+
+    private void startws(Integer userID) {
+        Request request = new Request.Builder().url("ws" + Endpoint + "websocket/" + userID.toString() + "-" + userNickName).build();
 
         ws = client.newWebSocket(request, new Ws());
 
         client.dispatcher().executorService().shutdown();
     }
 
-    private void uploadHit(CollidableCircle cc){
+    private void uploadHit(CollidableCircle cc) {
         NetworkPaintSync nps = new NetworkPaintSync();
         nps.Location = cc.GetPrincipleLocation();
         nps.Size = Math.round(cc.GetPrincipleSize());
@@ -155,7 +177,7 @@ public class BackendNetworkSync implements NetworkSync, NetworkSyncX {
 
     @Override
     public Float GetTimeBeforeGameStart() {
-        if (!GameReady){
+        if (!GameReady) {
             return 1f;
         }
         StartTime = Float.valueOf(System.currentTimeMillis());
@@ -164,9 +186,18 @@ public class BackendNetworkSync implements NetworkSync, NetworkSyncX {
 
     @Override
     public List<RemotePlayer> GetPlayers() {
-        return new ArrayList<RemotePlayer>();
+        List<RemotePlayer> al = new ArrayList<RemotePlayer>();
+
+        for (Map.Entry<Integer, RemotePlayer> integerRemotePlayerEntry : playerMap.entrySet()) {
+            al.add(integerRemotePlayerEntry.getValue());
+        }
+
+
+        return al;
     }
+
     private List<NetworkPaint> buf = new LinkedList<>();
+
     @Override
     public void SubmitHit(CollidableCircle cc) {
         uploadHit(cc);
@@ -180,50 +211,62 @@ public class BackendNetworkSync implements NetworkSync, NetworkSyncX {
     }
 
     @Override
-    public String GetFlashMsg(){
+    public String GetFlashMsg() {
         String fm = flashmsg;
         flashmsg = null;
         return fm;
     }
 
+    class NetworkPaintSync implements NetworkPaint {
+        public String Event;
+        public Integer Size;
+        public Integer ID;
+        public Integer LID;
+        public Point Location;
+
+        public void FromJson(String s) throws JSONException {
+            JSONObject jo = new JSONObject(s);
+            Event = jo.getString("eventType");
+            JSONObject detail = jo.getJSONObject("detail");
+            Size = detail.getInt("Size");
+            ID = jo.getInt("userId");
+            LID = playerIDMap.get(ID);
+            Location = new Point((float) detail.getInt("LocationX"), (float) detail.getInt("LocationY"));
+        }
+
+        public String ToJson() throws JSONException {
+            JSONObject jo = new JSONObject();
+            jo.put("eventType", Event);
+            JSONObject detail = new JSONObject();
+            detail.put("Size", Size);
+            detail.put("ID", ID);
+            detail.put("LocationX", Math.round(Location.getX()));
+            detail.put("LocationY", Math.round(Location.getY()));
+            jo.put("detail", detail);
+            return jo.toString();
+
+        }
+
+        @Override
+        public Integer OwnerID() {
+            if (ID.equals(userID)) {
+                return 0;
+            } else {
+                return LID;
+            }
+
+        }
+
+        @Override
+        public Point Location() {
+            return Location;
+        }
+
+        @Override
+        public Float Size() {
+            return (float) Size;
+        }
+    }
+
 }
-class NetworkPaintSync implements NetworkPaint {
-    public String Event;
-    public Integer Size;
-    public Integer ID;
-    public Point Location;
-    public void FromJson(String s) throws JSONException {
-        JSONObject jo = new JSONObject(s);
-        Event = jo.getString("eventType");
-        JSONObject detail = jo.getJSONObject("detail");
-        Size = detail.getInt("Size");
-        //ID = detail.getInt("ID");
-        Location = new Point((float)detail.getInt("LocationX"),(float)detail.getInt("LocationY"));
-    }
-    public String ToJson() throws JSONException {
-        JSONObject jo = new JSONObject();
-        jo.put("eventType",Event);
-        JSONObject detail = new JSONObject();
-        detail.put("Size",Size);
-        detail.put("ID",ID);
-        detail.put("LocationX",Math.round(Location.getX()));
-        detail.put("LocationY",Math.round(Location.getY()));
-        jo.put("detail",detail);
-        return jo.toString();
 
-    }
-    @Override
-    public Integer OwnerID() {
-        return 0;
-    }
-
-    @Override
-    public Point Location() {
-        return Location;
-    }
-
-    @Override
-    public Float Size() {
-        return (float)Size;
-    }
-}
