@@ -42,7 +42,7 @@ public class NameInputFragment extends BaseFragment {
             @Override
             public boolean onEditorAction(TextView text, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    submitUserName(mBtnSubmit.getText().toString());
+                    submitUserName(mEtName.getText().toString());
                     return true;
                 }
                 return false;
@@ -53,7 +53,7 @@ public class NameInputFragment extends BaseFragment {
         mBtnSubmit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                submitUserName(mBtnSubmit.getText().toString());
+                submitUserName(mEtName.getText().toString());
             }
         });
 
