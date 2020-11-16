@@ -8,6 +8,7 @@ import ie.tcd.asepaint2020.logic.internal.*;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 public class GameStatusImpl implements GameStatus, ViewPointTranslator, TickReceiver, GameBoard {
     private static final int ScreenPointX = 1080;
@@ -354,24 +355,19 @@ public class GameStatusImpl implements GameStatus, ViewPointTranslator, TickRece
 
     @Override
     public Boolean IsGameEnded() {
-        return !GameNotEnded();
-    }
-
-    @Override
-    public Player GetOwnStatus() {
-        return LocalPlayer;
-    }
-
-    @Override
-    public List<Player> GetAllStatus() {
-        List<Player> ret = new ArrayList<>();
-        ret.add(LocalPlayer);
-        if (remotePlayers != null) {
-            for (RemotePlayer rp : remotePlayers
-            ) {
-                ret.add(rp);
-            }
+        if(NetworkSyncX.class.isAssignableFrom(ns.getClass())){
+            NetworkSyncX nsx = (NetworkSyncX) ns;
+            return nsx.IsGameOvered();
         }
-        return ret;
+        return false;
+    }
+
+    @Override
+    public Map<String, Integer> GetGameResult() {
+        if(NetworkSyncX.class.isAssignableFrom(ns.getClass())){
+            NetworkSyncX nsx = (NetworkSyncX) ns;
+            return nsx.GetGameResult();
+        }
+        return null;
     }
 }

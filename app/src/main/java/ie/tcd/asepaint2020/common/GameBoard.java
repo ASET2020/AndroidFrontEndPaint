@@ -1,6 +1,7 @@
 package ie.tcd.asepaint2020.common;
 
 import java.util.List;
+import java.util.Map;
 
 public interface GameBoard {
     //The location of printing board
@@ -16,6 +17,5 @@ public interface GameBoard {
     Float TimeBeforeGameStart();
 
     Boolean IsGameEnded();
-    Player GetOwnStatus();
-    List<Player> GetAllStatus();
+    Map<String,Integer> GetGameResult();
 }
