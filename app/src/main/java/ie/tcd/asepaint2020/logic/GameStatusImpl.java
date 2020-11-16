@@ -220,8 +220,8 @@ public class GameStatusImpl implements GameStatus, ViewPointTranslator, TickRece
         Float MovementFactor = 1 - AttritionFactor;
 
         //Cursor Movement Acceleration
-        Float XMovement = (float) Math.cos(JoystickMovementDir) * JoystickMovementForce;
-        Float YMovement = -(float) Math.sin(JoystickMovementDir) * JoystickMovementForce;
+        Float XMovement = (float) Math.cos(JoystickMovementDir) * JoystickMovementForce * 6;
+        Float YMovement = -(float) Math.sin(JoystickMovementDir) * JoystickMovementForce * 6;
 
         CursorSpeedVector.setX(Math.min((CursorSpeedVector.getX() * AttritionFactor) + (XMovement * MovementFactor), MaxMovementSpeed));
         CursorSpeedVector.setY(Math.min((CursorSpeedVector.getY() * AttritionFactor) + (YMovement * MovementFactor), MaxMovementSpeed));

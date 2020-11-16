@@ -125,6 +125,11 @@ public class BackendNetworkSync implements NetworkSync, NetworkSyncX {
                                         i++;
                                         String s = it.next();
                                         Integer thispid = Integer.valueOf(s);
+                                        if(thispid.equals(userID)){
+                                            i--;
+                                            playerIDMap.put(thispid, 0);
+                                            continue;
+                                        }
                                         playerIDMap.put(thispid, i);
                                         RemotePlayer rp = new RemotePlayer(i, UsernameObj.getString(s));
                                         playerMap.put(thispid, rp);
