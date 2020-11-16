@@ -8,4 +8,6 @@ public interface NetworkSyncX {
     Boolean IsGameOvered();
 
     Map<String, Integer> GetGameResult();
+
+    Integer GetSeed();
 }

@@ -1,25 +1,15 @@
 package ie.tcd.asepaint2020.logic;
 
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
 import ie.tcd.asepaint2020.common.Cursor;
 import ie.tcd.asepaint2020.common.GameBoard;
 import ie.tcd.asepaint2020.common.GameInput;
 import ie.tcd.asepaint2020.common.Paint;
-import ie.tcd.asepaint2020.logic.game.BoardImpl;
-import ie.tcd.asepaint2020.logic.game.LocalPlayer;
-import ie.tcd.asepaint2020.logic.game.OuterLimit;
-import ie.tcd.asepaint2020.logic.game.PaintImpl;
-import ie.tcd.asepaint2020.logic.game.RemotePlayer;
-import ie.tcd.asepaint2020.logic.internal.AllCollideJudgements;
-import ie.tcd.asepaint2020.logic.internal.CollidableCircle;
-import ie.tcd.asepaint2020.logic.internal.CollidableCircleImpl;
-import ie.tcd.asepaint2020.logic.internal.Metronome;
-import ie.tcd.asepaint2020.logic.internal.Point;
-import ie.tcd.asepaint2020.logic.internal.TickReceiver;
-import ie.tcd.asepaint2020.logic.internal.ViewPointTranslator;
+import ie.tcd.asepaint2020.logic.game.*;
+import ie.tcd.asepaint2020.logic.internal.*;
+
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
 public class GameStatusImpl implements GameStatus, ViewPointTranslator, TickReceiver, GameBoard {
     private static final int ScreenPointX = 1080;
@@ -184,6 +174,8 @@ public class GameStatusImpl implements GameStatus, ViewPointTranslator, TickRece
     private void initGame() {
         CanvasBoard = new BoardImpl(viewpointLimit);
         mt = new Metronome(TickPerSecond);
+        CursorLocationVector.setY(viewpointLimit.getSizeY() / 2);
+        CursorLocationVector.setX(viewpointLimit.getSizeX() / 2);
     }
 
     static {
@@ -206,12 +198,16 @@ public class GameStatusImpl implements GameStatus, ViewPointTranslator, TickRece
             Flashmsg = "";
         }
 
-        if(NetworkSyncX.class.isAssignableFrom(ns.getClass())){
+        if (NetworkSyncX.class.isAssignableFrom(ns.getClass())) {
             NetworkSyncX nsx = (NetworkSyncX) ns;
             String fsg = nsx.GetFlashMsg();
-            if(fsg!=null){
+            if (fsg != null) {
                 Flashmsg = fsg;
                 Flashremain = 1f;
+            }
+            Integer seed = nsx.GetSeed();
+            if (seed != null) {
+                CanvasBoard.setSeed(seed);
             }
 
         }
@@ -260,7 +256,7 @@ public class GameStatusImpl implements GameStatus, ViewPointTranslator, TickRece
                 boolean hit = CanvasBoard.JudgePaintHitOrMiss(cc);
                 if (hit) {
                     submitHitToServer(cc);
-                }else {
+                } else {
                     Flashmsg = "Missed";
                     Flashremain = 1f;
                 }

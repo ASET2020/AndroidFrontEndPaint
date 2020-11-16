@@ -169,6 +169,7 @@ public class BackendNetworkSync implements NetworkSync, NetworkSyncX {
                                     }
 
                                     GameOver = true;
+                                    ws.close(1000,"");
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
@@ -263,6 +264,11 @@ public class BackendNetworkSync implements NetworkSync, NetworkSyncX {
     @Override
     public Map<String, Integer> GetGameResult() {
         return scoreboard;
+    }
+
+    @Override
+    public Integer GetSeed() {
+        return seed;
     }
 
     class NetworkPaintSync implements NetworkPaint {

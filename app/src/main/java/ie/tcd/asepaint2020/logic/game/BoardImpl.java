@@ -1,13 +1,26 @@
 package ie.tcd.asepaint2020.logic.game;
 
+import android.util.Log;
 import ie.tcd.asepaint2020.logic.internal.*;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import java.io.UnsupportedEncodingException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.LinkedList;
 import java.util.List;
 
 public class BoardImpl implements CollidableBox, TickReceiver {
     private OuterLimit screen;
     private List<PaintImpl> paintList;
+
+    public void setSeed(Integer seed) {
+        Seed = seed;
+    }
+
+    private Integer Seed = 0;
+    private Float CurrentSecond2 = 0f;
 
     public List<PaintImpl> getPaintList() {
         return paintList;
@@ -84,9 +97,45 @@ public class BoardImpl implements CollidableBox, TickReceiver {
         paintList.add(paint);
     }
 
+    public static String hmacDigest(String msg, String keyString, String algo) {
+        String digest = null;
+        try {
+            SecretKeySpec key = new SecretKeySpec((keyString).getBytes("UTF-8"), algo);
+            Mac mac = Mac.getInstance(algo);
+            mac.init(key);
+
+            byte[] bytes = mac.doFinal(msg.getBytes("ASCII"));
+
+            StringBuffer hash = new StringBuffer();
+            for (int i = 0; i < bytes.length; i++) {
+                String hex = Integer.toHexString(0xFF & bytes[i]);
+                if (hex.length() == 1) {
+                    hash.append('0');
+                }
+                hash.append(hex);
+            }
+            digest = hash.toString();
+        } catch (UnsupportedEncodingException e) {
+        } catch (InvalidKeyException e) {
+        } catch (NoSuchAlgorithmException e) {
+        }
+        return digest;
+    }
+
     @Override
     public void Tick(Float tickScaler) {
         //Bound Check and update speed
+        CurrentSecond2+=tickScaler;
+
+        Float RandNow = ((float) ((hmacDigest(String.valueOf(Seed.hashCode()) , String.valueOf(Integer.valueOf(Math.round(CurrentSecond2 / 3))),"HmacSHA1").hashCode()) % 128) / 128f);
+
+        Log.d("BoardImpl",RandNow.toString());
+        Log.d("BoardImpl",Seed.toString());
+        Log.d("BoardImpl", String.valueOf(Integer.valueOf(Seed.hashCode())));
+
+        MovementVector.setY(((float) Math.sin(RandNow * Math.PI) * tickScaler * 900) + MovementVector.getY());
+        MovementVector.setX(((float) Math.cos(RandNow * Math.PI) * tickScaler * 900) + MovementVector.getX());
+
         Point loc = new Point(CurrentLocation.getX() + MovementVector.getX() * tickScaler, CurrentLocation.getY() + MovementVector.getY() * tickScaler);
 
         if (!CollideJudgment.IsIntersectionExist(new CollidableBoxImpl(loc, this.Size), screen)) {
