@@ -10,4 +10,5 @@ public interface GameStatus {
     void SubmitMovement(GameInput input);
     Cursor GetCursor();
     String GetFlashMsg();
+    void OpenConnection(String s);
 }

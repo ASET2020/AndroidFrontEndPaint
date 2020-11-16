@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import ie.tcd.asepaint2020.logic.*;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
@@ -16,9 +17,6 @@ import ie.tcd.asepaint2020.event.StartGameEvent;
 import ie.tcd.asepaint2020.fragment.GameFragment;
 import ie.tcd.asepaint2020.fragment.LobbyFragment;
 import ie.tcd.asepaint2020.fragment.NameInputFragment;
-import ie.tcd.asepaint2020.logic.BackendNetworkSync;
-import ie.tcd.asepaint2020.logic.GameStatus;
-import ie.tcd.asepaint2020.logic.GameStatusImpl;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -29,7 +27,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        gs = new GameStatusImpl(new BackendNetworkSync());
+        gs = new GameStatusImpl(new NetworkSyncFactory() {
+            @Override
+            public NetworkSync Create(String Username) {
+                return new BackendNetworkSync(Username);
+            }
+        });
 
         EventBus.getDefault().register(this);
         replaceFragment(new NameInputFragment());

@@ -45,12 +45,13 @@ public class GameStatusImpl implements GameStatus, ViewPointTranslator, TickRece
     private List<RemotePlayer> remotePlayers;
 
     private NetworkSync ns;
+    private NetworkSyncFactory nsf;
 
     private String Flashmsg = "";
     private Float Flashremain = 0f;
 
-    public GameStatusImpl(NetworkSync ns) {
-        this.ns = ns;
+    public GameStatusImpl(NetworkSyncFactory ns) {
+        this.nsf = ns;
     }
 
     @Override
@@ -120,6 +121,11 @@ public class GameStatusImpl implements GameStatus, ViewPointTranslator, TickRece
     @Override
     public String GetFlashMsg() {
         return Flashmsg;
+    }
+
+    @Override
+    public void OpenConnection(String s) {
+        ns = nsf.Create(s);
     }
 
     public void updateInternal() {

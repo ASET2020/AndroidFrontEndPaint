@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import ie.tcd.asepaint2020.MainActivity;
 import org.greenrobot.eventbus.EventBus;
 
 import ie.tcd.asepaint2020.R;
@@ -65,6 +66,9 @@ public class NameInputFragment extends Fragment {
 
     private void submit(String text) {
         // TODO: 09/11/2020
+        String s;
+        s = etName.getText().toString();
+        ((MainActivity) getActivity()).getGameStatus().OpenConnection(s);
         EventBus.getDefault().post(new EnterLobbyEvent());
     }
 

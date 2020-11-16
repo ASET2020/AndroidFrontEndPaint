@@ -37,7 +37,8 @@ public class BackendNetworkSync implements NetworkSync, NetworkSyncX {
     Map<Integer, RemotePlayer> playerMap = new HashMap<>();
     Map<Integer, Integer> playerIDMap = new HashMap<>();
 
-    public BackendNetworkSync() {
+    public BackendNetworkSync(String name) {
+        userNickName = name;
         new Thread(new Runnable() {
             @Override
             public void run() {
