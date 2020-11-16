@@ -12,6 +12,7 @@ import org.greenrobot.eventbus.Subscribe;
 import org.greenrobot.eventbus.ThreadMode;
 
 import ie.tcd.asepaint2020.event.EnterLobbyEvent;
+import ie.tcd.asepaint2020.event.NameInputEvent;
 import ie.tcd.asepaint2020.event.StartGameEvent;
 import ie.tcd.asepaint2020.fragment.GameFragment;
 import ie.tcd.asepaint2020.fragment.LobbyFragment;
@@ -65,7 +66,26 @@ public class MainActivity extends AppCompatActivity {
         replaceFragment(new GameFragment());
     }
 
+
+    @Subscribe(threadMode = ThreadMode.MAIN)
+    public void enterName(NameInputEvent event) {
+        // TODO: 09/11/2020  new LobbyFragment should have user name parameters
+        replaceFragment(new NameInputFragment());
+    }
+
     public GameStatus getGameStatus() {
+        return gs;
+    }
+
+    public GameStatus getGameStatus(Boolean reset) {
+        if (reset) {
+            gs = new GameStatusImpl(new NetworkSyncFactory() {
+                @Override
+                public NetworkSync Create(String Username) {
+                    return new BackendNetworkSync(Username);
+                }
+            });
+        }
         return gs;
     }
 }
