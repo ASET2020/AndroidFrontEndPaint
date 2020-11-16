@@ -2,7 +2,6 @@ package ie.tcd.asepaint2020.fragment;
 
 import android.os.Handler;
 import android.util.Log;
-import android.util.Pair;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
@@ -18,41 +17,38 @@ import java.util.TimerTask;
 import ie.tcd.asepaint2020.R;
 import ie.tcd.asepaint2020.common.GameInput;
 import ie.tcd.asepaint2020.logic.GameStatus;
-import ie.tcd.asepaint2020.utils.DisplayUtil;
 import io.github.controlwear.virtual.joystick.android.JoystickView;
 
+/**
+ * the fragment for gaming
+ */
 public class GameFragment extends BaseFragment {
 
-    public final int MOVE_DISTANCE = DisplayUtil.dip2px(getContext(), 7);
+    private View cursor;
 
-    View cursor;
+    // object for controlling cursor
+    private JoystickView joystick;
 
-    JoystickView joystick;
+    private Button btnThrow;
 
-    Button btnThrow;
-
-    ImageView ivPaint;
+    private ImageView ivPaint;
 
     private Handler handler = new Handler();
     Timer myt = new Timer();
 
+    // the game board
+    private GameBoardView board;
 
-    @Override
-    int getLayoutId() {
-        return R.layout.fragment_game;
-    }
+    // the game status
+    private GameStatus gs;
 
+    private Boolean isMoving = false;
+    private Float joystickDirection = 0f;
+    private Float joystickForce = 0f;
+    private Boolean isShooting = false;
 
-    GameBoardView board;
-
-    GameStatus gs;
-
-    Boolean isMoving = false;
-    Float joystickDirection = 0f;
-    Float joystickForce = 0f;
-    Boolean isShooting = false;
-
-    TextView tvShootTip;
+    // the tip for hitting results
+    private TextView tvShootTip;
 
     GameInput gi = new GameInput() {
         @Override
@@ -76,19 +72,18 @@ public class GameFragment extends BaseFragment {
         }
     };
 
+
+    @Override
+    int getLayoutId() {
+        return R.layout.fragment_game;
+    }
+
     @Override
     void initView(final View view) {
-
-        // TODO: 09/11/2020  should init color
         cursor = view.findViewById(R.id.cursor);
         joystick = view.findViewById(R.id.joystickView);
-
         board = view.findViewById(R.id.board);
-
         tvShootTip = view.findViewById(R.id.tv_shoot_tip);
-
-        //board.startMove(60);
-
         this.gs = getGameStatus();
 
         view.getRootView().post(new Runnable() {
@@ -104,10 +99,7 @@ public class GameFragment extends BaseFragment {
         btnThrow.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // TODO: 09/11/2020
-//                Toast.makeText(getContext(), "shooting ....", Toast.LENGTH_LONG).show();
-                //startThrowAnim();
-                //isShooting = true;
+
             }
         });
 
@@ -137,15 +129,6 @@ public class GameFragment extends BaseFragment {
                     gs.SubmitMovement(gi);
                     return;
                 }
-
-                int y = (int) (Math.sin(Math.toRadians(angle)) * MOVE_DISTANCE);
-                int x = -(int) (Math.cos(Math.toRadians(angle)) * MOVE_DISTANCE);
-
-                Log.d("GameFragment", "x=" + x);
-                Log.d("GameFragment", "y=" + y);
-
-                // TODO: 08/11/2020 detect margin
-                //((View) cursor.getParent()).scrollBy(x, y);
                 isMoving = true;
                 joystickDirection = (float) Math.toRadians(angle);
                 joystickForce = (float) strength;
@@ -187,13 +170,9 @@ public class GameFragment extends BaseFragment {
 
     private void startThrowAnim() {
 
-
         View parent = (View) cursor.getParent();
         final int scrollY = parent.getScrollY();
         final int scrollX = parent.getScrollX();
-
-        Log.d("jump", "scrollY:" + scrollY);
-        Log.d("jump", "scrollX:" + scrollX);
 
         int y = ivPaint.getBottom() / 2 + scrollY;
         int x = scrollX;
@@ -230,23 +209,12 @@ public class GameFragment extends BaseFragment {
     }
 
 
+    /**
+     * change the content of tip view
+     */
     public void changeTips(String text) {
         if (tvShootTip != null) {
             tvShootTip.setText(text);
         }
-    }
-
-    private Pair getCursorPosition() {
-
-        View parent = (View) cursor.getParent();
-        final int scrollY = parent.getScrollY();
-        final int scrollX = parent.getScrollX();
-        // Cursor center
-        float newX = cursor.getLeft() - scrollX + cursor.getWidth() / 2f;
-        float newY = cursor.getTop() - scrollY + cursor.getHeight() / 2f;
-
-        Log.d("jump", "newX" + newX);
-        Log.d("jump", "newY" + newY);
-        return new Pair<Float, Float>(newX, newY);
     }
 }

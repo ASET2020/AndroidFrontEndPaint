@@ -12,7 +12,9 @@ import androidx.fragment.app.Fragment;
 import ie.tcd.asepaint2020.MainActivity;
 import ie.tcd.asepaint2020.logic.GameStatus;
 
-
+/**
+ * the basic fragment class, all the fragment class need extend this class
+ */
 abstract class BaseFragment extends Fragment {
     @Nullable
     @Override
@@ -22,10 +24,19 @@ abstract class BaseFragment extends Fragment {
         return view;
     }
 
+    /**
+     * get the layout id of fragment layput
+     */
     abstract int getLayoutId();
 
+    /**
+     * init the view of fragment
+     */
     abstract void initView(View view);
 
+    /**
+     * get the GameStatus from Activity
+     */
     public GameStatus getGameStatus() {
         return ((MainActivity) getActivity()).getGameStatus();
     }

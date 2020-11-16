@@ -18,12 +18,18 @@ import java.util.Map;
 import ie.tcd.asepaint2020.R;
 import ie.tcd.asepaint2020.event.EnterLobbyEvent;
 
+/**
+ * the dialog for final results
+ */
 public class ScoreDialog extends Dialog {
 
-    TextView[] tvNames = new TextView[4];
-    TextView[] tvScores = new TextView[4];
+    private static final int MAX_USERS = 4;
 
-    Button btnBack;
+    // user names and use scores
+    private TextView[] tvNames = new TextView[MAX_USERS];
+    private TextView[] tvScores = new TextView[MAX_USERS];
+
+    private Button btnBack;
 
     public ScoreDialog(@NonNull Context context) {
         super(context);
@@ -64,6 +70,9 @@ public class ScoreDialog extends Dialog {
 
     }
 
+    /**
+     * show the final scores
+     */
     public void showScores(Map<String, Integer> nameScoreMap) {
         if (nameScoreMap == null) {
             return;

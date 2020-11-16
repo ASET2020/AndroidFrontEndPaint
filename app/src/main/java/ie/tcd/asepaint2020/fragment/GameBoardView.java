@@ -1,6 +1,5 @@
 package ie.tcd.asepaint2020.fragment;
 
-import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -13,15 +12,18 @@ import androidx.annotation.Nullable;
 import java.util.List;
 
 import ie.tcd.asepaint2020.logic.GameStatus;
-import ie.tcd.asepaint2020.logic.internal.Collidable;
 
+/**
+ * the view for game board
+ */
 public class GameBoardView extends View {
 
     private Paint paint;
     private float left;
     private float top;
 
-    private ObjectAnimator moveAnimator;
+    // game status
+    private GameStatus gs;
 
 
     public GameBoardView(Context context) {
@@ -52,40 +54,37 @@ public class GameBoardView extends View {
         Float sizex = gs.GetGameStatus().GetSizeX();
         Float sizey = gs.GetGameStatus().GetSizeY();
 
-        // get center coordinate
-        float centerX = left + sizex / 2;
-        float centerY = top + sizey / 2;
-
+        // draw the game board
         canvas.drawRect(left, top, left + sizex, top + sizey, paint);
 
-
-            List<ie.tcd.asepaint2020.common.Paint> pi = gs.GetGameStatus().GetPaints();
-
-            for (ie.tcd.asepaint2020.common.Paint hit : pi) {
-                String pclor = hit.Color();
-                switch (pclor) {
-                    case "Blue":
-                        paint.setColor(Color.BLUE);
-                        break;
-                    case "Green":
-                        paint.setColor(Color.GREEN);
-                        break;
-                    case "Red":
-                        paint.setColor(Color.RED);
-                        break;
-                    case "Orange":
-                        paint.setColor(Color.YELLOW);
-                        break;
-                }
-
-                canvas.drawCircle(left + hit.LocationX(), top + hit.LocationY() , hit.Size(), paint);
+        // draw the hitting
+        List<ie.tcd.asepaint2020.common.Paint> pi = gs.GetGameStatus().GetPaints();
+        for (ie.tcd.asepaint2020.common.Paint hit : pi) {
+            String pclor = hit.Color();
+            switch (pclor) {
+                case "Blue":
+                    paint.setColor(Color.BLUE);
+                    break;
+                case "Green":
+                    paint.setColor(Color.GREEN);
+                    break;
+                case "Red":
+                    paint.setColor(Color.RED);
+                    break;
+                case "Orange":
+                    paint.setColor(Color.YELLOW);
+                    break;
             }
+            // every hit is a circle
+            canvas.drawCircle(left + hit.LocationX(), top + hit.LocationY(), hit.Size(), paint);
+        }
 
     }
 
-    GameStatus gs;
-
-    public void setGameLogic(GameStatus gs){
+    /**
+     * set the Game Status
+     */
+    public void setGameLogic(GameStatus gs) {
         this.gs = gs;
     }
 

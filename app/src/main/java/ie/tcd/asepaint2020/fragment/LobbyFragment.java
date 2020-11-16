@@ -2,12 +2,15 @@ package ie.tcd.asepaint2020.fragment;
 
 import android.view.View;
 
-import ie.tcd.asepaint2020.MainActivity;
 import org.greenrobot.eventbus.EventBus;
 
+import ie.tcd.asepaint2020.MainActivity;
 import ie.tcd.asepaint2020.R;
 import ie.tcd.asepaint2020.event.StartGameEvent;
 
+/**
+ * the fragment for lobby
+ */
 public class LobbyFragment extends BaseFragment {
 
     @Override
