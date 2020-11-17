@@ -1,10 +1,13 @@
 package ie.tcd.asepaint2020.logic.game;
 
 import ie.tcd.asepaint2020.common.Paint;
-import ie.tcd.asepaint2020.logic.internal.ViewPointTranslator;
 import ie.tcd.asepaint2020.logic.internal.CollidableCircle;
 import ie.tcd.asepaint2020.logic.internal.Point;
+import ie.tcd.asepaint2020.logic.internal.ViewPointTranslator;
 
+/**
+ * the implementation of Paint
+ */
 public class PaintImpl implements CollidableCircle, Paint {
     public PaintImpl(BoardImpl board, Point relPosition, Float paintSize, Player owner, ViewPointTranslator tr) {
         this.board = board;

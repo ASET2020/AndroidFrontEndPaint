@@ -1,5 +1,8 @@
 package ie.tcd.asepaint2020.logic.game;
 
+/**
+ * LocalPlayer contains the information of local user
+ */
 public class LocalPlayer implements Player, ie.tcd.asepaint2020.common.Player {
     private final int ID = 0;
     private int Score = 0;

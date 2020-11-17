@@ -23,8 +23,12 @@ import ie.tcd.asepaint2020.logic.GameStatusImpl;
 import ie.tcd.asepaint2020.logic.NetworkSync;
 import ie.tcd.asepaint2020.logic.NetworkSyncFactory;
 
+/**
+ * the Main Activity of app
+ */
 public class MainActivity extends AppCompatActivity {
 
+    // GameStatus of every match
     private GameStatus gs;
 
     @Override
@@ -32,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // init GameStatus
         gs = new GameStatusImpl(new NetworkSyncFactory() {
             @Override
             public NetworkSync Create(String Username) {
@@ -39,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        // register eventbus
         EventBus.getDefault().register(this);
         replaceFragment(new NameInputFragment());
     }
@@ -49,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
     }
 
+    // replace the content
     private void replaceFragment(Fragment fragment) {
         FragmentManager fragmentManager = getSupportFragmentManager();
         FragmentTransaction transaction = fragmentManager.beginTransaction();
@@ -69,14 +76,15 @@ public class MainActivity extends AppCompatActivity {
 
     @Subscribe(threadMode = ThreadMode.MAIN)
     public void enterName(NameInputEvent event) {
-        // TODO: 09/11/2020  new LobbyFragment should have user name parameters
         replaceFragment(new NameInputFragment());
     }
 
+    // replace the GameStatus
     public GameStatus getGameStatus() {
         return gs;
     }
 
+    // reset the Status
     public GameStatus getGameStatus(Boolean reset) {
         if (reset) {
             gs = new GameStatusImpl(new NetworkSyncFactory() {

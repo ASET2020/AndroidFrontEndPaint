@@ -1,12 +1,18 @@
 package ie.tcd.asepaint2020.logic.game;
 
+/**
+ * RemotePlayer
+ */
 public class RemotePlayer implements Player, ie.tcd.asepaint2020.common.Player {
     private Integer ID;
     private Integer Score;
     private String name;
 
-    private String colorFromID(){
-        switch (ID){
+    /**
+     * get the color of each player
+     */
+    private String colorFromID() {
+        switch (ID) {
             case 1:
                 return "Green";
             case 2:
